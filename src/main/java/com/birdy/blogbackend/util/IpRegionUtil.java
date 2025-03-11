@@ -5,8 +5,16 @@ import com.birdy.blogbackend.exception.BusinessException;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.lionsoul.ip2region.xdb.Searcher;
+import org.springframework.scheduling.annotation.Async;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -21,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class IpRegionUtil {
     private static final IpRegionUtil IP_REGION_UTIL = new IpRegionUtil();
-    private static final String DB_PATH = "./data/ip2region.xdb";
+    public static final String DB_PATH = "./data/ip2region.xdb";
     // 1、从 dbPath 中预先加载 VectorIndex 缓存，并且把这个得到的数据作为全局变量，后续反复使用。
     private byte[] vIndex;
 
@@ -36,6 +44,37 @@ public class IpRegionUtil {
 
     public static IpRegionUtil getInstance() {
         return IP_REGION_UTIL;
+    }
+
+    @Async
+    public void downloadIpDb() {
+        String url = "https://raw.githubusercontent.com/lionsoul2014/ip2region/refs/heads/master/data/ip2region.xdb";
+        String filePath = "./data/ip2region.xdb";
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder().url(url).build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Failed to download file: " + response);
+            }
+
+            ResponseBody body = response.body();
+            if (body != null) {
+                try (InputStream inputStream = body.byteStream();
+                     FileOutputStream outputStream = new FileOutputStream(filePath)) {
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                }
+                log.info("Downloaded ip2region.xdb to {}", filePath);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Region search(String ip) {

@@ -41,3 +41,5 @@ out/
 /config/
 /BlogBackend.log
 /logs/
+/data/
+/.initiated

@@ -9,11 +9,11 @@ spring:
       enabled: true
   data:
     redis:
-      host: 127.0.0.1
+      host: 118.178.138.202
       port: 6379
       database: 0
   datasource:
-    url: jdbc:postgresql://d4.ihuizhi.top:1234/postgres
+    url: jdbc:postgresql://118.178.138.202/postgres
     username: pg
     password: 123456
     driverClassName: org.postgresql.Driver

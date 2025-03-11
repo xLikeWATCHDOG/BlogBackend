@@ -140,3 +140,18 @@ CREATE TABLE IF NOT EXISTS "invite_record"
     updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available  BOOLEAN   DEFAULT TRUE              NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS "article"
+(
+    id          BIGSERIAL PRIMARY KEY,
+    uid         BIGINT                              NOT NULL,
+    pid         BIGINT                              NOT NULL,
+    title       VARCHAR(256)                        NOT NULL,
+    description TEXT                                NOT NULL,
+    content     TEXT                                NOT NULL,
+    tags        TEXT                                NULL,
+    views       BIGINT    DEFAULT 1                 NOT NULL,
+    createTime  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updateTime  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    available   BOOLEAN   DEFAULT TRUE              NOT NULL
+);
