@@ -1,0 +1,25 @@
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+  application:
+    name: BlogBackend
+  shell:
+    interactive:
+      enabled: true
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+  datasource:
+    url: jdbc:postgresql://123.0.0.1:5432/pg
+    username: pg
+    password: 123456
+    driverClassName: org.postgresql.Driver
+server:
+  address: 0.0.0.0
+  port: 8102
+springdoc:
+  swagger-ui:
+    enabled: true
