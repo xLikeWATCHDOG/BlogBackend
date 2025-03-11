@@ -1,4 +1,4 @@
-package com.birdy.blogbackend.entity;
+package com.birdy.blogbackend.domain.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.mybatisflex.annotation.Column;
@@ -15,9 +15,9 @@ import java.util.Date;
 /**
  * @author birdy
  */
-@Table("permission")
+@Table("oauth")
 @Data
-public class Permission implements Serializable {
+public class OAuth implements Serializable {
     @Serial
     @Column(ignore = true)
     private static final long serialVersionUID = 1L;
@@ -33,25 +33,29 @@ public class Permission implements Serializable {
     @ExcelProperty(value = "UID", index = 1)
     private Long uid;
 
-    @Schema(description = "权限")
-    @ExcelProperty(value = "权限", index = 2)
-    private String permission;
+    @Schema(description = "平台")
+    @ExcelProperty(value = "平台", index = 2)
+    private Integer platform;
 
-    @Schema(description = "过期时间")
-    @ExcelProperty(value = "过期时间", index = 3)
-    private Long expiry;
+    @Schema(description = "openId")
+    @ExcelProperty(value = "openId", index = 3)
+    private String openId;
+
+    @Schema(description = "token")
+    @ExcelProperty(value = "token", index = 4)
+    private String token;
 
     @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 4)
+    @ExcelProperty(value = "创建时间", index = 5)
     private Date createTime;
 
     @Schema(description = "更新时间")
-    @ExcelProperty(value = "更新时间", index = 5)
+    @ExcelProperty(value = "更新时间", index = 6)
     @Column(onUpdateValue = "now()")
     private Date updateTime;
 
     @Schema(description = "可用性")
-    @ExcelProperty(value = "可用性", index = 6)
+    @ExcelProperty(value = "可用性", index = 7)
     @Column(isLogicDelete = true)
     private Boolean available;
 }

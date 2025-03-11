@@ -1,4 +1,4 @@
-package com.birdy.blogbackend.entity;
+package com.birdy.blogbackend.domain.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.mybatisflex.annotation.Column;
@@ -6,7 +6,10 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,6 +20,9 @@ import java.util.Date;
  */
 @Table(value = "log")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Log implements Serializable {
     @Serial
     @Column(ignore = true)

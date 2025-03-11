@@ -71,6 +71,12 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("me.zhyd.oauth:JustAuth:1.16.7")
     implementation("com.alibaba:easyexcel:4.0.3")
+    implementation("org.lionsoul:ip2region:2.7.0")
+    implementation("com.google.guava:guava:33.4.0-jre")
+    implementation("io.github.karlatemp:unsafe-accessor:1.7.0")
+    implementation("com.tencentcloudapi:tencentcloud-sdk-java:3.1.1215")
+
+    implementation("org.jetbrains:annotations:26.0.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -88,10 +94,6 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }
 
 publishing {

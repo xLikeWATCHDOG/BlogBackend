@@ -1,4 +1,4 @@
-package com.birdy.blogbackend.entity;
+package com.birdy.blogbackend.domain.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.mybatisflex.annotation.Column;
@@ -15,12 +15,13 @@ import java.util.Date;
 /**
  * @author birdy
  */
-@Table("invite_code")
+@Table("2fa")
 @Data
-public class InviteCode implements Serializable {
+public class OneTimePassword implements Serializable {
     @Serial
     @Column(ignore = true)
     private static final long serialVersionUID = 1L;
+
     /**
      * id
      */
@@ -33,33 +34,24 @@ public class InviteCode implements Serializable {
     @ExcelProperty(value = "UID", index = 1)
     private Long uid;
 
-    @Schema(description = "邀请码")
-    @ExcelProperty(value = "邀请码", index = 2)
-    private String code;
+    @Schema(description = "2FA密钥")
+    @ExcelProperty(value = "2FA密钥", index = 2)
+    private String secret;
 
-    @Schema(description = "过期时间")
-    @ExcelProperty(value = "过期时间", index = 3)
-    private Long expiry;
-
-    @Schema(description = "使用时间")
-    @ExcelProperty(value = "使用时间", index = 4)
-    private String defaultGroups;
-
-    @Schema(description = "可用次数")
-    @ExcelProperty(value = "可用次数", index = 5)
-    private Integer times;
+    @Schema(description = "强制开启")
+    @ExcelProperty(value = "强制开启", index = 3)
+    private Boolean forceEnable;
 
     @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 6)
+    @ExcelProperty(value = "创建时间", index = 4)
     private Date createTime;
 
     @Schema(description = "更新时间")
-    @ExcelProperty(value = "更新时间", index = 7)
-    @Column(onUpdateValue = "now()")
+    @ExcelProperty(value = "更新时间", index = 5)
     private Date updateTime;
 
     @Schema(description = "可用性")
-    @ExcelProperty(value = "可用性", index = 8)
+    @ExcelProperty(value = "可用性", index = 6)
     @Column(isLogicDelete = true)
     private Boolean available;
 }

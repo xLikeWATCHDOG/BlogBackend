@@ -1,4 +1,4 @@
-package com.birdy.blogbackend.entity;
+package com.birdy.blogbackend.domain.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.mybatisflex.annotation.Column;

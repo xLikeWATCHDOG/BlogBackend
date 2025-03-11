@@ -1,4 +1,4 @@
-package com.birdy.blogbackend.entity;
+package com.birdy.blogbackend.domain.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.mybatisflex.annotation.Column;
@@ -15,29 +15,31 @@ import java.util.Date;
 /**
  * @author birdy
  */
-@Table("photo")
+@Table("permission")
 @Data
-public class Photo implements Serializable {
+public class Permission implements Serializable {
     @Serial
     @Column(ignore = true)
     private static final long serialVersionUID = 1L;
-
+    /**
+     * id
+     */
     @Id(keyType = KeyType.Auto)
     @Schema(description = "ID")
-    @ExcelProperty(value = "PID", index = 0)
-    private Long pid;
+    @ExcelProperty(value = "ID", index = 0)
+    private Long id;
 
-    @Schema(description = "MD5")
-    @ExcelProperty(value = "MD5", index = 1)
-    private String md5;
+    @Schema(description = "UID")
+    @ExcelProperty(value = "UID", index = 1)
+    private Long uid;
 
-    @Schema(description = "后缀")
-    @ExcelProperty(value = "后缀", index = 2)
-    private String ext;
+    @Schema(description = "权限")
+    @ExcelProperty(value = "权限", index = 2)
+    private String permission;
 
-    @Schema(description = "大小")
-    @ExcelProperty(value = "大小", index = 3)
-    private Long size;
+    @Schema(description = "过期时间")
+    @ExcelProperty(value = "过期时间", index = 3)
+    private Long expiry;
 
     @Schema(description = "创建时间")
     @ExcelProperty(value = "创建时间", index = 4)
@@ -45,6 +47,7 @@ public class Photo implements Serializable {
 
     @Schema(description = "更新时间")
     @ExcelProperty(value = "更新时间", index = 5)
+    @Column(onUpdateValue = "now()")
     private Date updateTime;
 
     @Schema(description = "可用性")
