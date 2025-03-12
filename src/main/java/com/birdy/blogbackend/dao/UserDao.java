@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class UserDao extends ServiceImpl<UserMapper, User> implements IService<User> {
+
 }

@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS "user"
     gender     INTEGER   DEFAULT 3                 NOT NULL,
     avatar     VARCHAR(256)                        NULL,
     status     INTEGER   DEFAULT 0                 NOT NULL,
-    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available  BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS "permission"
     uid        BIGINT                              NOT NULL,
     permission VARCHAR(32)                         NOT NULL,
     expiry     BIGINT    DEFAULT 0                 NOT NULL,
-    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available  BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS "oauth"
     platform   INTEGER                             NOT NULL,
     openId     VARCHAR(64)                         NOT NULL,
     token      VARCHAR(64)                         NOT NULL,
-    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available  BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -42,17 +42,17 @@ CREATE TABLE IF NOT EXISTS "log"
 (
     id         BIGSERIAL PRIMARY KEY,
     uid        BIGINT                              NULL,
-    requestId  VARCHAR(36)                         NOT NULL,
+    request_id  VARCHAR(36)                         NOT NULL,
     ip         VARCHAR(32)                         NULL,
     headers    TEXT                                NULL,
     url        VARCHAR(256)                        NULL,
     method     VARCHAR(16)                         NULL,
     params     TEXT                                NULL,
     result     TEXT                                NULL,
-    httpCode   INTEGER                             NULL,
+    http_code   INTEGER                             NULL,
     cost       BIGINT                              NULL,
-    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available  BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -65,23 +65,23 @@ CREATE TABLE IF NOT EXISTS "security_log"
     types      VARCHAR(36)                         NOT NULL,
     ip         VARCHAR(32)                         NULL,
     info       TEXT                                NULL,
-    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available  BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "orders"
 (
-    outTradeNo    VARCHAR(128) PRIMARY KEY,
+    out_trade_no   VARCHAR(128) PRIMARY KEY,
     uid           BIGINT                              NOT NULL,
     subject       VARCHAR(128)                        NOT NULL,
     tradeNo       VARCHAR(128)                        NULL,
-    totalAmount   BIGINT                              NOT NULL,
-    receiptAmount BIGINT                              NULL,
-    payPlatform   INTEGER   DEFAULT 0                 NOT NULL,
-    tradeStatus   INTEGER   DEFAULT 0                 NOT NULL,
-    createTime    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    total_amount   BIGINT                              NOT NULL,
+    receipt_amount BIGINT                              NULL,
+    pay_platform   INTEGER   DEFAULT 0                 NOT NULL,
+    trade_status   INTEGER   DEFAULT 0                 NOT NULL,
+    create_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available     BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS "blacklist"
     ip         VARCHAR(32)                         NOT NULL,
     log        BIGINT                              NOT NULL,
     reason     VARCHAR(256)                        NULL,
-    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available  BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -102,8 +102,8 @@ CREATE TABLE IF NOT EXISTS "photo"
     md5        VARCHAR(32)                         NOT NULL,
     ext        VARCHAR(16)                         NOT NULL,
     size       BIGINT                              NOT NULL,
-    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available  BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -112,9 +112,9 @@ CREATE TABLE IF NOT EXISTS "2fa"
     id          BIGSERIAL PRIMARY KEY,
     uid         BIGINT                              NOT NULL,
     secret      VARCHAR(512)                        NOT NULL,
-    forceEnable BOOLEAN   DEFAULT FALSE             NOT NULL,
-    createTime  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    force_enable BOOLEAN   DEFAULT FALSE             NOT NULL,
+    create_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available   BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -124,10 +124,10 @@ CREATE TABLE IF NOT EXISTS "invite_code"
     uid           BIGINT                              NOT NULL,
     code          VARCHAR(16)                         NOT NULL,
     expiry        BIGINT    DEFAULT 0                 NOT NULL,
-    defaultGroups TEXT                                NULL,
+    default_groups TEXT                                NULL,
     times         INTEGER   DEFAULT 0                 NOT NULL,
-    createTime    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available     BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -136,8 +136,8 @@ CREATE TABLE IF NOT EXISTS "invite_record"
     id         BIGSERIAL PRIMARY KEY,
     uid        BIGINT                              NOT NULL,
     code       VARCHAR(16)                         NOT NULL,
-    createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available  BOOLEAN   DEFAULT TRUE              NOT NULL
 );
 
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS "article"
     content     TEXT                                NOT NULL,
     tags        TEXT                                NULL,
     views       BIGINT    DEFAULT 1                 NOT NULL,
-    createTime  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updateTime  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available   BOOLEAN   DEFAULT TRUE              NOT NULL
 );

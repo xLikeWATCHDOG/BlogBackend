@@ -18,7 +18,7 @@ public class TencentCaptchaResponse implements Serializable {
     /**
      * 腾讯云验证码应用ID
      */
-    private Long CaptchaAppId;
-    private String bizState;
+    private Long appid;
+    private String sid;
     private String randstr;
 }

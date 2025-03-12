@@ -13,11 +13,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 腾讯验证码工具类
+ *
+ * @author birdy
+ */
 @Data
 @Slf4j
-/*
-  腾讯验证码工具类
- */
 public class TencentCaptchaUtil {
     private String secretId;
     private String secretKey;

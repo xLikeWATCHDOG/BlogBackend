@@ -1,12 +1,10 @@
-package com.birdy.blogbackend.domain.entity;
+package com.birdy.blogbackend.domain.dto;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
-import com.mybatisflex.annotation.Table;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -15,9 +13,7 @@ import java.util.Date;
 /**
  * @author birdy
  */
-@Table("user")
-@Data
-public class User implements Serializable {
+public class UserVO implements Serializable {
     @Serial
     @Column(ignore = true)
     private static final long serialVersionUID = 1L;
@@ -32,10 +28,6 @@ public class User implements Serializable {
     @Schema(description = "用户名")
     @ExcelProperty(value = "用户名", index = 1)
     private String username;
-
-    @Schema(description = "密码")
-    @ExcelProperty(value = "密码", index = 2)
-    private String password;
 
     @Schema(description = "邮箱")
     @ExcelProperty(value = "邮箱", index = 3)
@@ -64,9 +56,4 @@ public class User implements Serializable {
     @Schema(description = "更新时间")
     @ExcelProperty(value = "更新时间", index = 9)
     private Date updateTime;
-
-    @Schema(description = "可用性")
-    @ExcelProperty(value = "可用性", index = 10)
-    @Column(isLogicDelete = true)
-    private Boolean available;
 }

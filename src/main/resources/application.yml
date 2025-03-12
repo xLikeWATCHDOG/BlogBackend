@@ -23,3 +23,22 @@ server:
 springdoc:
   swagger-ui:
     enabled: true
+common:
+  tencent:
+    secretId: "123"
+    secretKey: "123"
+  captcha:
+    captchaAppId: "123"
+    appSecretKey: "234"
+    enable: true
+  sms:
+    secretId: "你的SecretId"
+    secretKey: "你的SecretKey"
+    smsSdkAppId: "1400000000" # 腾讯云短信应用ID
+    signName: "你的短信签名"
+    templateId: "123456" # 你在腾讯云配置的短信模板ID
+  account:
+    captchaEnable: true
+    registerEnable: true
+    forgetEnable: true
+    inviteEnable: true
