@@ -22,9 +22,6 @@ public class ConfigProperties {
     @NestedConfigurationProperty
     public SmsConfig sms;
 
-    @NestedConfigurationProperty
-    public AccountConfig account;
-
     @Data
     public static class TencentConfig {
         private String secretId;
@@ -45,14 +42,5 @@ public class ConfigProperties {
         private String smsSdkAppId;
         private String signName;
         private String templateId;
-    }
-
-
-    @Data
-    public static class AccountConfig {
-        private boolean captchaEnable;
-        private boolean registerEnable;
-        private boolean forgetEnable;
-        private boolean inviteEnable;
     }
 }

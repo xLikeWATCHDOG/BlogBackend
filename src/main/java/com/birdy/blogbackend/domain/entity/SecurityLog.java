@@ -62,5 +62,5 @@ public class SecurityLog implements Serializable {
     @Schema(description = "可用性")
     @ExcelProperty(value = "可用性", index = 9)
     @Column(isLogicDelete = true)
-    private Boolean available;
+    private Integer available;
 }

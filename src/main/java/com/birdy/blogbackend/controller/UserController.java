@@ -1,6 +1,8 @@
 package com.birdy.blogbackend.controller;
 
 import com.birdy.blogbackend.config.ConfigProperties;
+import com.birdy.blogbackend.domain.dto.UserVO;
+import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
 import com.birdy.blogbackend.domain.vo.request.UserLoginRequest;
 import com.birdy.blogbackend.domain.vo.response.BaseResponse;
@@ -12,13 +14,16 @@ import com.birdy.blogbackend.util.gson.GsonProvider;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.birdy.blogbackend.constant.CommonConstant.CAPTCHA_HEADER;
+import static com.birdy.blogbackend.constant.UserConstant.LOGIN_TOKEN;
 
 /**
  * @author birdy
@@ -59,10 +64,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<BaseResponse<String>> login(UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public ResponseEntity<BaseResponse<UserVO>> login(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         checkCaptcha(request);
-        log.info(userLoginRequest.getUsername());
-        log.info(userLoginRequest.getPassword());
-        return ResponseEntity.ok(BaseResponse.success("ok"));
+        User user = userService.userLogin(userLoginRequest, request);
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        // 获取Token
+        String token = request.getSession().getAttribute(LOGIN_TOKEN).toString();
+        userVO.setToken(token);
+        return ResponseEntity.ok(BaseResponse.success(userVO));
     }
 }

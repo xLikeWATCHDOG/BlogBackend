@@ -5,6 +5,7 @@ import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.util.Date;
 /**
  * @author birdy
  */
+@Data
 public class UserVO implements Serializable {
     @Serial
     @Column(ignore = true)
@@ -49,11 +51,15 @@ public class UserVO implements Serializable {
     @ExcelProperty(value = "状态", index = 7)
     private Integer status;
 
+    @Schema(description = "token")
+    @ExcelProperty(value = "token", index = 8)
+    private String token;
+
     @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 8)
+    @ExcelProperty(value = "创建时间", index = 9)
     private Date createTime;
 
     @Schema(description = "更新时间")
-    @ExcelProperty(value = "更新时间", index = 9)
+    @ExcelProperty(value = "更新时间", index = 10)
     private Date updateTime;
 }
