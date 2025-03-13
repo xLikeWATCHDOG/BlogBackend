@@ -1,4 +1,4 @@
-package com.birdy.blogbackend.util.captcha;
+package com.birdy.blogbackend.util.tencent;
 
 import com.birdy.blogbackend.domain.enums.ReturnCode;
 import com.birdy.blogbackend.domain.vo.response.TencentCaptchaResponse;

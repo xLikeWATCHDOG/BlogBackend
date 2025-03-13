@@ -4,6 +4,7 @@ import com.birdy.blogbackend.dao.UserDao;
 import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
 import com.birdy.blogbackend.domain.enums.UserStatus;
+import com.birdy.blogbackend.domain.vo.request.PhoneLoginRequest;
 import com.birdy.blogbackend.domain.vo.request.UserLoginRequest;
 import com.birdy.blogbackend.event.user.UserLoginEvent;
 import com.birdy.blogbackend.exception.BusinessException;
@@ -79,39 +80,6 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             return true;
         }
-    }
-
-    @Override
-    public @NotNull User userLogin(@NotNull UserLoginRequest userLoginRequest, @NotNull HttpServletRequest request) {
-        User user = getLoginUserIgnoreError(request);
-        if (user != null) {
-            return user;
-        }
-        String email = userLoginRequest.getEmail();
-        String password = userLoginRequest.getPassword();
-        // 判断是否是邮箱登录
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("email", email);
-        user = this.getOne(queryWrapper);
-        if (user == null) {
-            throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "账户信息不存在", request);
-        }
-        long uid = user.getUid();
-        if (checkFailLogin(email, request)) {
-            throw new BusinessException(ReturnCode.TOO_MANY_REQUESTS_ERROR, "登录失败次数过多，请稍后再试", request);
-        }
-        // 检查密码
-        if (!PasswordUtil.checkPassword(password, user.getPassword())) {
-            addFailLogin(email, request);
-            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "密码错误", request);
-        }
-        UserLoginEvent event = new UserLoginEvent(this, user, request);
-        eventPublisher.publishEvent(event);
-        if (event.isCancelled()) {
-            throw new BusinessException(ReturnCode.CANCELLED, "登录被取消", request);
-        }
-        setLoginState(user, request);
-        return user;
     }
 
     @Override
@@ -195,8 +163,84 @@ public class UserServiceImpl implements UserService {
         return userDao.getMapper();
     }
 
+    /**
+     * 获取当前登录用户
+     */
+    @Override
+    public @NotNull User getLoginUser(@NotNull HttpServletRequest request) {
+        // 先判断是否已登录
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null || currentUser.getUid() == null) {
+            throw new BusinessException(ReturnCode.NOT_LOGIN_ERROR, "未登录", request);
+        }
+        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        long uid = currentUser.getUid();
+        String oldPass = currentUser.getPassword();
+        currentUser = this.getById(uid);
+        if (currentUser == null || !currentUser.getPassword().equals(oldPass)) {
+            throw new BusinessException(ReturnCode.NOT_LOGIN_ERROR, "未登录", request);
+        }
+        checkStatus(currentUser, request);
+        request.getSession().setAttribute(USER_LOGIN_STATE, currentUser);
+        return currentUser;
+    }
+
     @Override
     public @Nullable User getLoginUserIgnoreError(@NotNull HttpServletRequest request) {
-        return null;
+        try {
+            return getLoginUser(request);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public @NotNull User userLogin(@NotNull UserLoginRequest userLoginRequest, @NotNull HttpServletRequest request) {
+        User user = getLoginUserIgnoreError(request);
+        if (user != null) {
+            return user;
+        }
+        String email = userLoginRequest.getEmail();
+        String password = userLoginRequest.getPassword();
+        // 判断是否是邮箱登录
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("email", email);
+        user = this.getOne(queryWrapper);
+        if (user == null) {
+            throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "账户信息不存在", request);
+        }
+        long uid = user.getUid();
+        if (checkFailLogin(email, request)) {
+            throw new BusinessException(ReturnCode.TOO_MANY_REQUESTS_ERROR, "登录失败次数过多，请稍后再试", request);
+        }
+        // 检查密码
+        if (!PasswordUtil.checkPassword(password, user.getPassword())) {
+            addFailLogin(email, request);
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "密码错误", request);
+        }
+        UserLoginEvent event = new UserLoginEvent(this, user, request);
+        eventPublisher.publishEvent(event);
+        if (event.isCancelled()) {
+            throw new BusinessException(ReturnCode.CANCELLED, "登录被取消", request);
+        }
+        setLoginState(user, request);
+        return user;
+    }
+
+    @Override
+    public @NotNull User phoneLogin(@NotNull PhoneLoginRequest phoneLoginRequest, @NotNull HttpServletRequest request) {
+        // 检查是否有目标手机号的用户存在
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("phone", phoneLoginRequest.getPhone());
+        User user = this.getOne(queryWrapper);
+        if (user == null) {
+            // 不存在则创建新用户
+            user = new User();
+            user.setPhone(phoneLoginRequest.getPhone());
+            this.save(user);
+        }
+        setLoginState(user, request);
+        return user;
     }
 }
