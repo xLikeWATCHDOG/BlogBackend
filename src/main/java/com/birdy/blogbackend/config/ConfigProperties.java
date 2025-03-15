@@ -20,6 +20,9 @@ public class ConfigProperties {
     public CaptchaConfig captcha;
 
     @NestedConfigurationProperty
+    public AliyunConfig aliyun;
+
+    @NestedConfigurationProperty
     public SmsConfig sms;
 
     @Data
@@ -36,11 +39,15 @@ public class ConfigProperties {
     }
 
     @Data
-    public static class SmsConfig {
+    public static class AliyunConfig {
         private String secretId;
         private String secretKey;
-        private String smsSdkAppId;
+
+    }
+
+    @Data
+    public static class SmsConfig {
         private String signName;
-        private String templateId;
+        private String templateCode;
     }
 }

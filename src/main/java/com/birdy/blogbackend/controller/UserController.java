@@ -1,36 +1,49 @@
 package com.birdy.blogbackend.controller;
 
 import com.birdy.blogbackend.config.ConfigProperties;
+import com.birdy.blogbackend.domain.ResultUtil;
 import com.birdy.blogbackend.domain.dto.UserVO;
 import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
-import com.birdy.blogbackend.domain.vo.request.EmailSendRequest;
-import com.birdy.blogbackend.domain.vo.request.PhoneLoginRequest;
-import com.birdy.blogbackend.domain.vo.request.UserLoginRequest;
+import com.birdy.blogbackend.domain.enums.StatusCode;
+import com.birdy.blogbackend.domain.vo.request.*;
+import com.birdy.blogbackend.domain.vo.request.forget.CheckForgetPasswordRequest;
+import com.birdy.blogbackend.domain.vo.request.forget.UserForgetPasswordRequest;
+import com.birdy.blogbackend.domain.vo.request.forget.UserForgetRequest;
 import com.birdy.blogbackend.domain.vo.response.BaseResponse;
 import com.birdy.blogbackend.domain.vo.response.TencentCaptchaResponse;
 import com.birdy.blogbackend.exception.BusinessException;
 import com.birdy.blogbackend.service.MailService;
+import com.birdy.blogbackend.service.PhotoService;
 import com.birdy.blogbackend.service.UserService;
 import com.birdy.blogbackend.util.CaffeineFactory;
 import com.birdy.blogbackend.util.NumberUtil;
+import com.birdy.blogbackend.util.aliyun.AliyunSmsUtil;
 import com.birdy.blogbackend.util.gson.GsonProvider;
 import com.birdy.blogbackend.util.tencent.TencentCaptchaUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.birdy.blogbackend.constant.CommonConstant.CAPTCHA_HEADER;
+import static com.birdy.blogbackend.constant.UserConstant.FORGET_TOKEN;
 import static com.birdy.blogbackend.constant.UserConstant.LOGIN_TOKEN;
 
 /**
@@ -43,12 +56,19 @@ public class UserController {
     public static TencentCaptchaUtil TENCENT_CAPTCHA_UTIL = null;
     @Autowired
     private UserService userService;
-    private static final Cache<String, Integer> MAIL_CODE_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
+    private static final Cache<String, String> MAIL_CODE_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
     @Autowired
     private ConfigProperties configProperties;
     private static final Cache<String, Integer> MAIL_FAIL_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(3, TimeUnit.MINUTES).build();
+    private static final Cache<String, Integer> PHONE_FAIL_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
+    public static final Cache<String, User> FORGET_PASSWORD_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
+
     @Autowired
     private MailService mailService;
+    @Autowired
+    private PhotoService photoService;
+    @Autowired
+    private AliyunSmsUtil aliyunSmsUtil;
 
     public void checkCaptcha(HttpServletRequest request) {
         if (!configProperties.captcha.isEnable()) {
@@ -83,7 +103,26 @@ public class UserController {
         // 获取Token
         String token = request.getSession().getAttribute(LOGIN_TOKEN).toString();
         userVO.setToken(token);
-        return ResponseEntity.ok(BaseResponse.success(userVO));
+        return ResultUtil.ok(userVO);
+    }
+
+    @PostMapping("/phone/code")
+    public ResponseEntity<BaseResponse<Boolean>> phoneCode(@RequestBody PhoneCodeSendRequest phoneCodeSendRequest, HttpServletRequest request) {
+        checkCaptcha(request);
+        // 生成6位随机验证码
+        String code = NumberUtil.getRandomCode(6);
+        // 存储验证码
+        PHONE_FAIL_CACHE.put(phoneCodeSendRequest.getPhone(), 0);
+        Map<String, String> params = Map.of("code", code);
+        boolean success = aliyunSmsUtil.send(params, phoneCodeSendRequest.getPhone());
+        if (!success) {
+            log.info("手机验证码发送成功，手机号：{}", phoneCodeSendRequest.getPhone());
+        } else {
+            log.error("手机验证码发送失败，手机号：{}", phoneCodeSendRequest.getPhone());
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "手机验证码发送失败，请稍后重试", request);
+        }
+
+        return ResultUtil.ok(true);
     }
 
     @PostMapping("/phone")
@@ -95,7 +134,46 @@ public class UserController {
         // 获取Token
         String token = request.getSession().getAttribute(LOGIN_TOKEN).toString();
         userVO.setToken(token);
-        return ResponseEntity.ok(BaseResponse.success(userVO));
+        return ResultUtil.ok(userVO);
+    }
+
+    @PostMapping("/forget")
+    public ResponseEntity<BaseResponse<Boolean>> forget(@RequestBody UserForgetRequest userForgetRequest, HttpServletRequest request) {
+        checkCaptcha(request);
+        String email = userForgetRequest.getEmail();
+        User user = userService.getByEmail(email, request);
+        String token = UUID.randomUUID().toString();
+        mailService.forgetPassword(email, token, request);
+        FORGET_PASSWORD_CACHE.put(token, user);
+
+        return ResultUtil.ok(true);
+    }
+
+    @PostMapping("forget/password")
+    public ResponseEntity<BaseResponse<Boolean>> forgetPassword(@RequestBody UserForgetPasswordRequest userForgetPasswordRequest, HttpServletRequest request) {
+        checkCaptcha(request);
+        String password = userForgetPasswordRequest.getPassword();
+        String token = request.getHeader(FORGET_TOKEN);
+        if (StringUtils.isAllBlank(token, password)) {
+            throw new BusinessException(ReturnCode.PARAMS_ERROR, "参数错误", request);
+        }
+        User user = FORGET_PASSWORD_CACHE.getIfPresent(token);
+        if (user == null) {
+            throw new BusinessException(ReturnCode.PARAMS_ERROR, "token无效", token, request);
+        }
+        userService.updatePassword(user, password, request);
+        FORGET_PASSWORD_CACHE.invalidate(token);
+        return ResultUtil.ok(true);
+    }
+
+    @PostMapping("check/forget")
+    public ResponseEntity<BaseResponse<String>> checkForgetPasswordToken(@RequestBody CheckForgetPasswordRequest checkForgetPasswordRequest, HttpServletRequest request) {
+        String token = checkForgetPasswordRequest.getToken();
+        User user = FORGET_PASSWORD_CACHE.getIfPresent(token);
+        if (user == null) {
+            throw new BusinessException(ReturnCode.PARAMS_ERROR, "token无效", token, request);
+        }
+        return ResultUtil.ok(user.getEmail());
     }
 
     @PostMapping("/mail")
@@ -118,7 +196,7 @@ public class UserController {
             // 清除失败计数
             MAIL_FAIL_CACHE.invalidate(email);
             // 存储验证码
-            MAIL_CODE_CACHE.put(email, Integer.parseInt(code));
+            MAIL_CODE_CACHE.put(email, code);
             log.info("邮件发送成功，邮箱：{}", email);
         } catch (Exception e) {
             // 发送失败处理
@@ -128,6 +206,90 @@ public class UserController {
             log.error("邮件发送失败，邮箱：{}，失败次数：{}", email, attempts);
             throw new BusinessException(ReturnCode.VALIDATION_FAILED, "邮件发送失败，请稍后重试", request);
         }
-        return ResponseEntity.ok(BaseResponse.success(true));
+        return ResultUtil.ok(true);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<BaseResponse<UserVO>> register(@RequestBody UserRegisterRequest userRegisterRequest, HttpServletRequest request) {
+        checkCaptcha(request);
+        // 验证邮箱验证码
+        String email = userRegisterRequest.getEmail();
+        String code = MAIL_CODE_CACHE.getIfPresent(email);
+        log.warn(userRegisterRequest.getCode());
+        if (code == null || !code.equalsIgnoreCase(userRegisterRequest.getCode())) {
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "验证码错误", request);
+        }
+        User user = userService.register(userRegisterRequest, request);
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        // 获取Token
+        String token = request.getSession().getAttribute(LOGIN_TOKEN).toString();
+        userVO.setToken(token);
+        return ResultUtil.ok(userVO);
+    }
+
+    @PostMapping("/token")
+    public ResponseEntity<BaseResponse<UserVO>> refreshToken(HttpServletRequest request) {
+        // 从请求头获取token
+        String token = request.getHeader(LOGIN_TOKEN);
+        if (token == null) {
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
+        }
+        // 通过token获取用户
+        User user = userService.getUserByToken(token, request);
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        // 刷新token
+        token = userService.refreshToken(user, request);
+        userVO.setToken(token);
+        return ResultUtil.ok(userVO);
+    }
+
+    @PostMapping("logout")
+    public ResponseEntity<BaseResponse<Boolean>> logout(HttpServletRequest request) {
+        userService.logout(request);
+        return ResultUtil.ok(true);
+    }
+
+    /**
+     * 获取头像
+     */
+    @GetMapping("/avatar/{uid}")
+    public ResponseEntity<InputStreamResource> getAvatar(@PathVariable("uid") Long uid, HttpServletRequest request) {
+        User user = userService.getById(uid);
+        Path path = null;
+        try {
+            if (user == null) {
+                path = photoService.getPhotoPathByMd5(String.valueOf(uid), request);
+            } else {
+                var avatar = user.getAvatar();
+                if (avatar == null) {
+                    userService.generateDefaultAvatar(user, request);
+                    throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "头像文件不存在", uid, request);
+                }
+                path = photoService.getPhotoPathByMd5(avatar, request);
+            }
+        } catch (Exception ignored) {
+        }
+        File file = new File(path.toString());
+        if (!file.exists()) {
+            if (user == null) {
+                userService.generateDefaultAvatar(uid, request);
+            } else {
+                userService.generateDefaultAvatar(user, request);
+            }
+            throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "头像文件不存在", uid, request);
+        }
+        try {
+            InputStream is = new FileInputStream(file);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_TYPE, Files.probeContentType(file.toPath()));
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName());
+            InputStreamResource inputStreamResource = new InputStreamResource(is);
+            return new ResponseEntity<>(inputStreamResource, headers, StatusCode.OK);
+        } catch (Throwable e) {
+            userService.generateDefaultAvatar(user, request);
+            throw new BusinessException(ReturnCode.SYSTEM_ERROR, "预览系统异常", request);
+        }
     }
 }

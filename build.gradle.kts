@@ -74,7 +74,11 @@ dependencies {
     implementation("org.lionsoul:ip2region:2.7.0")
     implementation("com.google.guava:guava:33.4.0-jre")
     implementation("io.github.karlatemp:unsafe-accessor:1.7.0")
-    implementation("com.tencentcloudapi:tencentcloud-sdk-java:3.1.1217")
+    implementation("com.tencentcloudapi:tencentcloud-sdk-java:3.1.1219")
+
+    implementation("com.aliyun:aliyun-java-sdk-core:4.7.3")
+    implementation("com.aliyun:aliyun-java-sdk-dysmsapi:2.2.1")
+
     implementation("org.eclipse.angus:angus-mail:2.0.3")
 
     implementation("org.jetbrains:annotations:26.0.2")
