@@ -153,5 +153,16 @@ CREATE TABLE IF NOT EXISTS "article"
     views       BIGINT    DEFAULT 1                 NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available   BOOLEAN   DEFAULT TRUE              NOT NULL
+    available INTEGER DEFAULT 1 NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "article_comment"
+(
+    id          BIGSERIAL PRIMARY KEY,
+    uid         BIGINT                              NOT NULL,
+    aid         BIGINT                              NOT NULL,
+    content     TEXT                                NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    available   INTEGER   DEFAULT 1                 NOT NULL
 );

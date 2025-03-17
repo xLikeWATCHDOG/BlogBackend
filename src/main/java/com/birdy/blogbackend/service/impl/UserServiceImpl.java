@@ -1,30 +1,34 @@
 package com.birdy.blogbackend.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.birdy.blogbackend.dao.OAuthDao;
 import com.birdy.blogbackend.dao.UserDao;
+import com.birdy.blogbackend.domain.entity.OAuth;
 import com.birdy.blogbackend.domain.entity.User;
+import com.birdy.blogbackend.domain.enums.OAuthPlatform;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
+import com.birdy.blogbackend.domain.enums.UserGender;
 import com.birdy.blogbackend.domain.enums.UserStatus;
-import com.birdy.blogbackend.domain.vo.request.PhoneLoginRequest;
-import com.birdy.blogbackend.domain.vo.request.UserLoginRequest;
-import com.birdy.blogbackend.domain.vo.request.UserRegisterRequest;
-import com.birdy.blogbackend.event.user.UserLoginEvent;
+import com.birdy.blogbackend.domain.vo.request.phone.PhoneLoginRequest;
+import com.birdy.blogbackend.domain.vo.request.user.UserLoginRequest;
+import com.birdy.blogbackend.domain.vo.request.user.UserRegisterRequest;
 import com.birdy.blogbackend.exception.BusinessException;
 import com.birdy.blogbackend.service.PhotoService;
 import com.birdy.blogbackend.service.UserService;
-import com.birdy.blogbackend.util.CaffeineFactory;
-import com.birdy.blogbackend.util.NetUtil;
-import com.birdy.blogbackend.util.NumberUtil;
-import com.birdy.blogbackend.util.PasswordUtil;
+import com.birdy.blogbackend.util.*;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.query.QueryWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.enums.AuthUserGender;
+import me.zhyd.oauth.model.AuthToken;
+import me.zhyd.oauth.model.AuthUser;
+import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -33,9 +37,12 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -53,13 +60,12 @@ public class UserServiceImpl implements UserService {
     public static final Cache<String, User> TOKEN_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(7, TimeUnit.DAYS).build();
     private static final Cache<String, Integer> FAIL_LOGIN_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
     private static final Cache<String, User> tokenCache = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(7, TimeUnit.DAYS).build();
-
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
     @Autowired
     private UserDao userDao;
     @Autowired
     private PhotoService photoService;
+    @Autowired
+    private OAuthDao oAuthDao;
 
     private void validateUserCredentials(String userName, String userPassword, HttpServletRequest request) {
         if (StringUtils.isAnyBlank(userName, userPassword)) {
@@ -240,11 +246,6 @@ public class UserServiceImpl implements UserService {
             addFailLogin(email, request);
             throw new BusinessException(ReturnCode.VALIDATION_FAILED, "密码错误", request);
         }
-        UserLoginEvent event = new UserLoginEvent(this, user, request);
-        eventPublisher.publishEvent(event);
-        if (event.isCancelled()) {
-            throw new BusinessException(ReturnCode.CANCELLED, "登录被取消", request);
-        }
         setLoginState(user, request);
         return user;
     }
@@ -279,7 +280,7 @@ public class UserServiceImpl implements UserService {
         }
         // 创建用户
         User user = new User();
-        user.setEmail(email);
+        user.setEmail(email.toLowerCase());
         user.setPassword(PasswordUtil.encodePassword(password));
         user.setUsername(generateUserName(email, "user", request));
         user.setStatus(0);
@@ -421,6 +422,15 @@ public class UserServiceImpl implements UserService {
         request.getSession().removeAttribute(LOGIN_TOKEN);
     }
 
+    public boolean checkIsLogin(HttpServletRequest request) {
+        try {
+            getLoginUser(request);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @Override
     public void updatePassword(@NotNull User user, @NotNull String password, @NotNull HttpServletRequest request) {
         if (!password.matches("^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z\\W_]+$)(?![a-z0-9]+$)(?![a-z\\W_]+$)(?![0-9\\W_]+$)[a-zA-Z0-9\\W_]{8,30}$")) {
@@ -433,4 +443,103 @@ public class UserServiceImpl implements UserService {
         user.setPassword(PasswordUtil.encodePassword(password));
         this.updateById(user);
     }
+
+    @Override
+    public @NotNull User oAuthLogin(@NotNull AuthUser authUser, @NotNull OAuthPlatform oAuthPlatForm, @NotNull HttpServletRequest request) {
+        // log.info("用户： {}", GsonProvider.normal().toJson(authUser));
+        String username = authUser.getUsername();
+        AuthToken authToken = authUser.getToken();
+        JSONObject rawUserInfo = authUser.getRawUserInfo();
+        String avatar = authUser.getAvatar();
+        String email = authUser.getEmail();
+        String openId = rawUserInfo.getString("id");
+        String token = authToken.getAccessToken();
+        AuthUserGender authUserGender = authUser.getGender();
+        UserGender userGender = UserGender.valueOf(authUserGender);
+        // 判断是否已经绑定过
+        QueryWrapper oAuthQueryWrapper = new QueryWrapper();
+        oAuthQueryWrapper.eq("platform", oAuthPlatForm.getCode());
+        if (checkIsLogin(request)) {
+            // bind
+            User user = getLoginUser(request);
+            oAuthQueryWrapper.eq("uid", user.getUid());
+            OAuth oAuth;
+            QueryWrapper oAuthQueryWrapper1 = new QueryWrapper();
+            oAuthQueryWrapper1.eq("platform", oAuthPlatForm.getCode());
+            oAuthQueryWrapper1.eq("openId", openId);
+            oAuth = oAuthDao.getOne(oAuthQueryWrapper1);
+            oAuth = new OAuth();
+            oAuth.setUid(user.getUid());
+            oAuth.setPlatform(oAuthPlatForm.getCode());
+            oAuth.setOpenId(openId);
+            oAuth.setToken(token);
+            boolean saveResult = oAuthDao.save(oAuth);
+            if (!saveResult) {
+                throw new BusinessException(ReturnCode.SYSTEM_ERROR, "添加失败，数据库错误", request);
+            }
+            return user;
+        }
+        oAuthQueryWrapper.eq("openId", openId);
+        OAuth oAuth = oAuthDao.getOne(oAuthQueryWrapper);
+        if (oAuth != null) {
+            // 已经绑定过，直接登录
+            User user = this.getById(oAuth.getUid());
+            if (user == null) {
+                throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "账户信息不存在", request);
+            }
+            setLoginState(user, request);
+            return user;
+        }
+        // 未绑定，创建账户
+        User user = new User();
+        username = generateUserName(username, oAuthPlatForm.name().toLowerCase(), request);
+        user.setUsername(username);
+        String randomPassword = StringUtil.getRandomString(10);
+        user.setPassword(PasswordUtil.encodePassword(randomPassword));
+        user.setEmail(email.toLowerCase());
+        user.setUserGender(userGender);
+        boolean saveResult = this.save(user);
+        if (!saveResult) {
+            throw new BusinessException(ReturnCode.SYSTEM_ERROR, "添加失败，数据库错误", request);
+        }
+        downloadAvatar(user, avatar, request);
+        // 绑定账户
+        oAuth = new OAuth();
+        oAuth.setUid(user.getUid());
+        oAuth.setPlatform(oAuthPlatForm.getCode());
+        oAuth.setOpenId(String.valueOf(openId));
+        oAuth.setToken(token);
+        saveResult = oAuthDao.save(oAuth);
+        if (!saveResult) {
+            throw new BusinessException(ReturnCode.SYSTEM_ERROR, "添加失败，数据库错误", request);
+        }
+        setLoginState(user, request);
+        return user;
+    }
+
+    @Async
+    @Override
+    public void downloadAvatar(@NotNull User user, @NotNull String avatarUrl, @NotNull HttpServletRequest request) {
+        clearAvatar(user, request);
+        try {
+            OkHttpClient client = new OkHttpClient();
+            okhttp3.Request req = new okhttp3.Request.Builder().url(avatarUrl).build();
+            okhttp3.Response res = client.newCall(req).execute();
+            InputStream inputStream = Objects.requireNonNull(res.body()).byteStream();
+            String ext = Objects.requireNonNull(res.body().contentType()).subtype();
+            byte[] data = res.body().bytes();
+            String md5 = DigestUtils.md5DigestAsHex(data);
+            String fileName = md5 + "." + ext;
+            photoService.savePhotoByMd5(md5, ext, data.length, request);
+            Path path = Paths.get("photos", fileName);
+            Files.createDirectories(path.getParent());
+            Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+            user.setAvatar(md5);
+            this.updateById(user);
+        } catch (IOException e) {
+            generateDefaultAvatar(user, request);
+            // throw new BusinessException(ReturnCode.OPERATION_ERROR, "Failed to download avatar", avatarUrl, request);
+        }
+    }
+
 }

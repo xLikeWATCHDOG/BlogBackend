@@ -15,9 +15,9 @@ import java.util.Date;
 /**
  * @author birdy
  */
-@Table("article")
+@Table("article_comment")
 @Data
-public class Article implements Serializable {
+public class ArticleComment implements Serializable {
     @Serial
     @Column(ignore = true)
     private static final long serialVersionUID = 1L;
@@ -33,29 +33,13 @@ public class Article implements Serializable {
     @ExcelProperty(value = "用户ID", index = 1)
     private Long uid;
 
-    @Schema(description = "照片ID")
-    @ExcelProperty(value = "照片ID", index = 2)
-    private Long pid;
-
-    @Schema(description = "标题")
-    @ExcelProperty(value = "标题", index = 3)
-    private String title;
-
-    @Schema(description = "描述")
-    @ExcelProperty(value = "描述", index = 4)
-    private String description;
+    @Schema(description = "文章ID")
+    @ExcelProperty(value = "文章ID", index = 2)
+    private Long aid;
 
     @Schema(description = "内容")
-    @ExcelProperty(value = "内容", index = 5)
+    @ExcelProperty(value = "内容", index = 3)
     private String content;
-
-    @Schema(description = "标签")
-    @ExcelProperty(value = "标签", index = 6)
-    private String tags;
-
-    @Schema(description = "浏览量")
-    @ExcelProperty(value = "浏览量", index = 7)
-    private Long views;
 
     @Schema(description = "创建时间")
     @ExcelProperty(value = "创建时间", index = 4)

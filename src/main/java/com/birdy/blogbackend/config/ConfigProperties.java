@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "common")
 public class ConfigProperties {
-
     @NestedConfigurationProperty
     public TencentConfig tencent;
 
@@ -24,6 +23,12 @@ public class ConfigProperties {
 
     @NestedConfigurationProperty
     public SmsConfig sms;
+
+    @NestedConfigurationProperty
+    public QQConfig qq;
+
+    @NestedConfigurationProperty
+    public GithubConfig github;
 
     @Data
     public static class TencentConfig {
@@ -49,5 +54,21 @@ public class ConfigProperties {
     public static class SmsConfig {
         private String signName;
         private String templateCode;
+    }
+
+    @Data
+    public static class QQConfig {
+        private String clientId;
+        private String clientSecret;
+        private String redirectUri;
+        private boolean enable;
+    }
+
+    @Data
+    public static class GithubConfig {
+        private String clientId;
+        private String clientSecret;
+        private String redirectUri;
+        private boolean enable;
     }
 }

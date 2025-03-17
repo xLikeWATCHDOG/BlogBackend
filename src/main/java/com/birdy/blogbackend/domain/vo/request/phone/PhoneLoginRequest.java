@@ -1,4 +1,4 @@
-package com.birdy.blogbackend.domain.vo.request;
+package com.birdy.blogbackend.domain.vo.request.phone;
 
 import lombok.Data;
 

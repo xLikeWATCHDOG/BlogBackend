@@ -1,7 +1,6 @@
 package com.birdy.blogbackend.service.impl;
 
 import com.birdy.blogbackend.domain.enums.ReturnCode;
-import com.birdy.blogbackend.event.EmailSendEvent;
 import com.birdy.blogbackend.exception.BusinessException;
 import com.birdy.blogbackend.service.MailService;
 import com.birdy.blogbackend.util.CaffeineFactory;
@@ -11,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -30,8 +28,6 @@ public class MailServiceImpl implements MailService {
     public static final Cache<String, Boolean> emailSent = CaffeineFactory.INSTANCE.newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES)
             .build();
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
     @Autowired
     private JavaMailSender javaMailSender;
     @Autowired
@@ -56,11 +52,6 @@ public class MailServiceImpl implements MailService {
             context.setVariable("code", code);
             String text = templateEngine.process("EmailCode", context);
             helper.setText(text, true);
-            EmailSendEvent event = new EmailSendEvent(this, to, message, request);
-            eventPublisher.publishEvent(event);
-            if (event.isCancelled()) {
-                throw new BusinessException(ReturnCode.CANCELLED, "邮件发送被取消", null);
-            }
             javaMailSender.send(message);
         } catch (Exception e) {
             log.error("邮件发送失败，邮箱：{}，错误信息：{}", to, e.getMessage());
@@ -84,11 +75,6 @@ public class MailServiceImpl implements MailService {
             context.setVariable("link", link);
             String text = templateEngine.process("ForgetPassword", context);
             helper.setText(text, true);
-            EmailSendEvent event = new EmailSendEvent(this, to, message, request);
-            eventPublisher.publishEvent(event);
-            if (event.isCancelled()) {
-                throw new BusinessException(ReturnCode.CANCELLED, "邮件发送被取消", null);
-            }
             javaMailSender.send(message);
         } catch (Exception e) {
             log.error("邮件发送失败，邮箱：{}，错误信息：{}", to, e.getMessage());

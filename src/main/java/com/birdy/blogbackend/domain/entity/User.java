@@ -1,6 +1,8 @@
 package com.birdy.blogbackend.domain.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.birdy.blogbackend.domain.enums.UserGender;
+import com.birdy.blogbackend.domain.enums.UserStatus;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
@@ -69,4 +71,20 @@ public class User implements Serializable {
     @ExcelProperty(value = "可用性", index = 10)
     @Column(isLogicDelete = true)
     private Integer available;
+
+    public UserGender getUserGender() {
+        return UserGender.valueOf(gender);
+    }
+
+    public void setUserGender(UserGender userGender) {
+        this.gender = userGender.getCode();
+    }
+
+    public UserStatus getUserStatus() {
+        return UserStatus.valueOf(status);
+    }
+
+    public void setUserStatus(UserStatus userStatus) {
+        this.status = userStatus.getCode();
+    }
 }

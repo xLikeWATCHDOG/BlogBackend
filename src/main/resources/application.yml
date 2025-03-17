@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Shanghai
@@ -26,17 +30,28 @@ springdoc:
 mybatis-flex:
   global-config:
     logic-delete-column: available
+website: "http://localhost:3000"
 common:
   tencent:
     secretId: "123"
     secretKey: "123"
-    captcha:
-      captchaAppId: "123"
-      appSecretKey: "234"
-      enable: true
+  captcha:
+    captchaAppId: "123"
+    appSecretKey: "234"
+    enable: true
   aliyun:
     secretId: "123"
     secretKey: "123"
   sms:
     signName: xx商城
-    templateCode: SMS_1xxxx
+    templateCode: SMS_1xxxxz
+  github:
+    clientId: "123"
+    clientSecret: "123"
+    redirectUri: "http://localhost:8102/oauth/github/callback"
+    enable: true
+  qq:
+    clientId: "123"
+    clientSecret: "123"
+    redirectUri: "http://localhost:3000"
+    enable: false

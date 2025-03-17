@@ -6,10 +6,14 @@ import com.birdy.blogbackend.domain.dto.UserVO;
 import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
 import com.birdy.blogbackend.domain.enums.StatusCode;
-import com.birdy.blogbackend.domain.vo.request.*;
+import com.birdy.blogbackend.domain.vo.request.EmailSendRequest;
 import com.birdy.blogbackend.domain.vo.request.forget.CheckForgetPasswordRequest;
 import com.birdy.blogbackend.domain.vo.request.forget.UserForgetPasswordRequest;
 import com.birdy.blogbackend.domain.vo.request.forget.UserForgetRequest;
+import com.birdy.blogbackend.domain.vo.request.phone.PhoneCodeSendRequest;
+import com.birdy.blogbackend.domain.vo.request.phone.PhoneLoginRequest;
+import com.birdy.blogbackend.domain.vo.request.user.UserLoginRequest;
+import com.birdy.blogbackend.domain.vo.request.user.UserRegisterRequest;
 import com.birdy.blogbackend.domain.vo.response.BaseResponse;
 import com.birdy.blogbackend.domain.vo.response.TencentCaptchaResponse;
 import com.birdy.blogbackend.exception.BusinessException;
@@ -96,7 +100,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<UserVO>> login(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
-        checkCaptcha(request);
+        //checkCaptcha(request);
         User user = userService.userLogin(userLoginRequest, request);
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
@@ -173,7 +177,7 @@ public class UserController {
         if (user == null) {
             throw new BusinessException(ReturnCode.PARAMS_ERROR, "token无效", token, request);
         }
-        return ResultUtil.ok(user.getEmail());
+        return ResultUtil.ok(user.getEmail().toLowerCase());
     }
 
     @PostMapping("/mail")
@@ -257,7 +261,7 @@ public class UserController {
     @GetMapping("/avatar/{uid}")
     public ResponseEntity<InputStreamResource> getAvatar(@PathVariable("uid") Long uid, HttpServletRequest request) {
         User user = userService.getById(uid);
-        Path path = null;
+        Path path;
         try {
             if (user == null) {
                 path = photoService.getPhotoPathByMd5(String.valueOf(uid), request);
@@ -265,11 +269,12 @@ public class UserController {
                 var avatar = user.getAvatar();
                 if (avatar == null) {
                     userService.generateDefaultAvatar(user, request);
-                    throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "头像文件不存在", uid, request);
                 }
                 path = photoService.getPhotoPathByMd5(avatar, request);
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "头像文件不存在", uid, request);
         }
         File file = new File(path.toString());
         if (!file.exists()) {
@@ -291,5 +296,13 @@ public class UserController {
             userService.generateDefaultAvatar(user, request);
             throw new BusinessException(ReturnCode.SYSTEM_ERROR, "预览系统异常", request);
         }
+    }
+
+    @RequestMapping("/getlogin")
+    public ResponseEntity<BaseResponse<UserVO>> getLogin(HttpServletRequest request) {
+        User user = userService.getLoginUser(request);
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return ResultUtil.ok(userVO);
     }
 }

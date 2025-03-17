@@ -1,11 +1,13 @@
 package com.birdy.blogbackend.service
 
 import com.birdy.blogbackend.domain.entity.User
-import com.birdy.blogbackend.domain.vo.request.PhoneLoginRequest
-import com.birdy.blogbackend.domain.vo.request.UserLoginRequest
-import com.birdy.blogbackend.domain.vo.request.UserRegisterRequest
+import com.birdy.blogbackend.domain.enums.OAuthPlatform
+import com.birdy.blogbackend.domain.vo.request.phone.PhoneLoginRequest
+import com.birdy.blogbackend.domain.vo.request.user.UserLoginRequest
+import com.birdy.blogbackend.domain.vo.request.user.UserRegisterRequest
 import com.mybatisflex.core.service.IService
 import jakarta.servlet.http.HttpServletRequest
+import me.zhyd.oauth.model.AuthUser
 import org.jetbrains.annotations.Nullable
 import org.springframework.scheduling.annotation.Async
 
@@ -31,4 +33,8 @@ interface UserService : IService<User?> {
     fun logout(request: HttpServletRequest)
     fun getByEmail(email: String, request: HttpServletRequest): User
     fun updatePassword(user: User, password: String, request: HttpServletRequest)
+    fun oAuthLogin(authUser: AuthUser, oAuthPlatform: OAuthPlatform, request: HttpServletRequest): User
+
+    @Async
+    fun downloadAvatar(user: User, avatarUrl: String, request: HttpServletRequest)
 }

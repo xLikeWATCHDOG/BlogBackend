@@ -1,6 +1,7 @@
 package com.birdy.blogbackend.domain.vo.request;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -8,16 +9,9 @@ import java.io.Serializable;
 /**
  * @author birdy
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class UserRegisterRequest implements Serializable {
+public class ArticleQueryRequest extends PageRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-
-    private String username;
-
-    private String email;
-
-    private String code;
-
-    private String password;
 }

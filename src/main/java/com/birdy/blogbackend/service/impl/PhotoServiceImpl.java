@@ -3,7 +3,6 @@ package com.birdy.blogbackend.service.impl;
 import com.birdy.blogbackend.dao.PhotoDao;
 import com.birdy.blogbackend.domain.entity.Photo;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
-import com.birdy.blogbackend.event.PhotoAddEvent;
 import com.birdy.blogbackend.exception.BusinessException;
 import com.birdy.blogbackend.service.PhotoService;
 import com.mybatisflex.core.BaseMapper;
@@ -34,12 +33,14 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public void savePhotoByMd5(@NotNull String md5, @NotNull String ext, long size, @NotNull HttpServletRequest request) {
+    public @NotNull Photo savePhotoByMd5(@NotNull String md5, @NotNull String ext, long size, @NotNull HttpServletRequest request) {
         // 查询md5是否已经记录
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("md5", md5);
         Photo photo = this.getOne(queryWrapper);
-        PhotoAddEvent photoAddEvent = new PhotoAddEvent(this, photo, request);
+        if (photo != null) {
+            return photo;
+        }
         // 保存
         photo = new Photo();
         photo.setMd5(md5);
@@ -49,11 +50,8 @@ public class PhotoServiceImpl implements PhotoService {
         }
         photo.setExt(ext);
         photo.setSize(size);
-        eventPublisher.publishEvent(photoAddEvent);
-        if (photoAddEvent.isCancelled()) {
-            throw new BusinessException(ReturnCode.CANCELLED, "添加图片事件被取消", request);
-        }
         this.save(photo);
+        return photo;
     }
 
     @Override
