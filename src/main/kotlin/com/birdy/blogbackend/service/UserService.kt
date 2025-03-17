@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest
 import me.zhyd.oauth.model.AuthUser
 import org.jetbrains.annotations.Nullable
 import org.springframework.scheduling.annotation.Async
+import org.springframework.web.multipart.MultipartFile
 
 interface UserService : IService<User?> {
     @Nullable
@@ -37,4 +38,5 @@ interface UserService : IService<User?> {
 
     @Async
     fun downloadAvatar(user: User, avatarUrl: String, request: HttpServletRequest)
+    fun setupAvatar(user: User, file: MultipartFile, request: HttpServletRequest)
 }

@@ -35,31 +35,27 @@ public class UserVO implements Serializable {
     @ExcelProperty(value = "邮箱", index = 3)
     private String email;
 
-    @Schema(description = "手机号")
-    @ExcelProperty(value = "手机号", index = 4)
-    private String phone;
-
     @Schema(description = "性别")
-    @ExcelProperty(value = "性别", index = 5)
+    @ExcelProperty(value = "性别", index = 4)
     private Integer gender;
 
     @Schema(description = "头像地址")
-    @ExcelProperty(value = "头像地址", index = 6)
+    @ExcelProperty(value = "头像地址", index = 5)
     private String avatar;
 
     @Schema(description = "状态")
-    @ExcelProperty(value = "状态", index = 7)
+    @ExcelProperty(value = "状态", index = 6)
     private Integer status;
 
     @Schema(description = "token")
-    @ExcelProperty(value = "token", index = 8)
+    @ExcelProperty(value = "token", index = 7)
     private String token;
 
     @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 9)
+    @ExcelProperty(value = "创建时间", index = 8)
     private Date createTime;
 
     @Schema(description = "更新时间")
-    @ExcelProperty(value = "更新时间", index = 10)
+    @ExcelProperty(value = "更新时间", index = 9)
     private Date updateTime;
 }

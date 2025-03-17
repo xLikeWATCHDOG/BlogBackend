@@ -12,8 +12,7 @@ import com.birdy.blogbackend.domain.vo.request.forget.UserForgetPasswordRequest;
 import com.birdy.blogbackend.domain.vo.request.forget.UserForgetRequest;
 import com.birdy.blogbackend.domain.vo.request.phone.PhoneCodeSendRequest;
 import com.birdy.blogbackend.domain.vo.request.phone.PhoneLoginRequest;
-import com.birdy.blogbackend.domain.vo.request.user.UserLoginRequest;
-import com.birdy.blogbackend.domain.vo.request.user.UserRegisterRequest;
+import com.birdy.blogbackend.domain.vo.request.user.*;
 import com.birdy.blogbackend.domain.vo.response.BaseResponse;
 import com.birdy.blogbackend.domain.vo.response.TencentCaptchaResponse;
 import com.birdy.blogbackend.exception.BusinessException;
@@ -22,6 +21,7 @@ import com.birdy.blogbackend.service.PhotoService;
 import com.birdy.blogbackend.service.UserService;
 import com.birdy.blogbackend.util.CaffeineFactory;
 import com.birdy.blogbackend.util.NumberUtil;
+import com.birdy.blogbackend.util.PasswordUtil;
 import com.birdy.blogbackend.util.aliyun.AliyunSmsUtil;
 import com.birdy.blogbackend.util.gson.GsonProvider;
 import com.birdy.blogbackend.util.tencent.TencentCaptchaUtil;
@@ -36,6 +36,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -298,11 +299,91 @@ public class UserController {
         }
     }
 
+    @PostMapping("/avatar")
+    public ResponseEntity<BaseResponse<Boolean>> uploadAvatar(@RequestBody MultipartFile file, HttpServletRequest request) {
+        // 从请求头获取token
+        String token = request.getHeader(LOGIN_TOKEN);
+        if (token == null) {
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
+        }
+        // 通过token获取用户
+        User user = userService.getUserByToken(token, request);
+        userService.setupAvatar(user, file, request);
+        return ResultUtil.ok(true);
+    }
+
     @RequestMapping("/getlogin")
     public ResponseEntity<BaseResponse<UserVO>> getLogin(HttpServletRequest request) {
-        User user = userService.getLoginUser(request);
+        // 从请求头获取token
+        String token = request.getHeader(LOGIN_TOKEN);
+        if (token == null) {
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
+        }
+        // 通过token获取用户
+        User user = userService.getUserByToken(token, request);
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         return ResultUtil.ok(userVO);
+    }
+
+    @GetMapping("/profile/{uid}")
+    public ResponseEntity<BaseResponse<UserVO>> getProfile(@PathVariable("uid") Long uid, HttpServletRequest request) {
+        User user = userService.getById(uid);
+        if (user == null) {
+            throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "用户不存在", uid, request);
+        }
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return ResultUtil.ok(userVO);
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<BaseResponse<Boolean>> update(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
+        // 从请求头获取token
+        String token = request.getHeader(LOGIN_TOKEN);
+        if (token == null) {
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
+        }
+        // 通过token获取用户
+        User loginUser = userService.getUserByToken(token, request);
+        loginUser.setUsername(userUpdateRequest.getUsername());
+        loginUser.setGender(userUpdateRequest.getGender());
+        userService.updateById(loginUser);
+        return ResultUtil.ok(true);
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<BaseResponse<Boolean>> updatePassword(@RequestBody UserPasswordRequest userPasswordRequest, HttpServletRequest request) {
+        // 从请求头获取token
+        String token = request.getHeader(LOGIN_TOKEN);
+        if (token == null) {
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
+        }
+        // 通过token获取用户
+        User loginUser = userService.getUserByToken(token, request);
+        String password = userPasswordRequest.getOldPassword();
+        if (!PasswordUtil.checkPassword(password, loginUser.getPassword())) {
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "原密码错误", request);
+        }
+        userService.updatePassword(loginUser, userPasswordRequest.getNewPassword(), request);
+        return ResultUtil.ok(true);
+    }
+
+    @PostMapping("/email")
+    public ResponseEntity<BaseResponse<Boolean>> updateEmail(@RequestBody UserEmailRequest userEmailRequest, HttpServletRequest request) {
+        // 从请求头获取token
+        String token = request.getHeader(LOGIN_TOKEN);
+        if (token == null) {
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
+        }
+        // 通过token获取用户
+        User loginUser = userService.getUserByToken(token, request);
+        String password = userEmailRequest.getPassword();
+        if (!PasswordUtil.checkPassword(password, loginUser.getPassword())) {
+            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "原密码错误", request);
+        }
+        loginUser.setEmail(userEmailRequest.getNewEmail());
+        userService.updateById(loginUser);
+        return ResultUtil.ok(true);
     }
 }

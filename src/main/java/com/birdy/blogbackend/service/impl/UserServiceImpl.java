@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.enums.AuthUserGender;
 import me.zhyd.oauth.model.AuthToken;
 import me.zhyd.oauth.model.AuthUser;
+import net.coobird.thumbnailator.Thumbnails;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +33,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -539,6 +542,38 @@ public class UserServiceImpl implements UserService {
         } catch (IOException e) {
             generateDefaultAvatar(user, request);
             // throw new BusinessException(ReturnCode.OPERATION_ERROR, "Failed to download avatar", avatarUrl, request);
+        }
+    }
+
+
+    @Override
+    public void setupAvatar(User user, MultipartFile file, HttpServletRequest request) {
+        // 获取旧头像
+        String oldAvatar = user.getAvatar();
+        clearAvatar(user, request);
+        if (file == null || file.isEmpty()) {
+            throw new BusinessException(ReturnCode.FORBIDDEN_ERROR, "图片为空", request);
+        }
+        try {
+            // 获取图片的长度和宽度
+            BufferedImage fi = ImageIO.read(file.getInputStream());
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            Thumbnails.of(file.getInputStream()).size(460, 460).toOutputStream(stream);
+            // 获取图片类型拓展名
+            String ext = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf("."));
+            byte[] data = file.getBytes();
+            String md5 = DigestUtils.md5DigestAsHex(data);
+            String fileName = md5 + ext;
+            photoService.savePhotoByMd5(md5, ext, data.length, request);
+            Path path = Paths.get("photos", fileName);
+            Files.createDirectories(path.getParent());
+            byte[] bytes = stream.toByteArray();
+            Files.write(path, bytes);
+            user.setAvatar(md5);
+            this.updateById(user);
+        } catch (IOException e) {
+            generateDefaultAvatar(user, request);
+            throw new BusinessException(ReturnCode.OPERATION_ERROR, "Failed to upload avatar", request);
         }
     }
 

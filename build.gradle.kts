@@ -74,7 +74,8 @@ dependencies {
     implementation("org.lionsoul:ip2region:2.7.0")
     implementation("com.google.guava:guava:33.4.0-jre")
     implementation("io.github.karlatemp:unsafe-accessor:1.7.0")
-    implementation("com.tencentcloudapi:tencentcloud-sdk-java:3.1.1219")
+    implementation("com.tencentcloudapi:tencentcloud-sdk-java:3.1.1220")
+    implementation("net.coobird:thumbnailator:0.4.20")
 
     implementation("com.aliyun:aliyun-java-sdk-core:4.7.3")
     implementation("com.aliyun:aliyun-java-sdk-dysmsapi:2.2.1")

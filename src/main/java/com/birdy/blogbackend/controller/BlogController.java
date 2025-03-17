@@ -105,13 +105,6 @@ public class BlogController {
         return getBaseResponseResponseEntity(articleQueryRequest, queryWrapper);
     }
 
-    @GetMapping("/hot")
-    public ResponseEntity<BaseResponse<Page<ArticleVO>>> hot(ArticleQueryRequest articleQueryRequest, HttpServletRequest request) {
-        // 本周热门
-        QueryWrapper queryWrapper = QueryWrapper.create().orderBy("views", false).orderBy("id", false).gt("update_time", "DATE_SUB(CURDATE(), INTERVAL 7 DAY)");
-        return getBaseResponseResponseEntity(articleQueryRequest, queryWrapper);
-    }
-
     @GetMapping("/rank")
     public ResponseEntity<BaseResponse<Page<ArticleVO>>> rank(ArticleQueryRequest articleQueryRequest, HttpServletRequest request) {
         // 全部文章按浏览量排序
