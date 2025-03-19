@@ -1,6 +1,7 @@
 package com.birdy.blogbackend.domain.dto;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.birdy.blogbackend.domain.entity.Permission;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
@@ -58,4 +59,8 @@ public class UserVO implements Serializable {
     @Schema(description = "更新时间")
     @ExcelProperty(value = "更新时间", index = 9)
     private Date updateTime;
+
+    @Schema(description = "用户组")
+    @ExcelProperty(value = "用户组", index = 10)
+    private Permission group;
 }

@@ -1,5 +1,6 @@
-package com.birdy.blogbackend.domain.vo.request;
+package com.birdy.blogbackend.domain.vo.request.article;
 
+import com.birdy.blogbackend.domain.vo.request.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

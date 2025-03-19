@@ -3,6 +3,7 @@ package com.birdy.blogbackend.controller;
 import com.birdy.blogbackend.config.ConfigProperties;
 import com.birdy.blogbackend.domain.ResultUtil;
 import com.birdy.blogbackend.domain.dto.UserVO;
+import com.birdy.blogbackend.domain.entity.Permission;
 import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
 import com.birdy.blogbackend.domain.enums.StatusCode;
@@ -17,6 +18,7 @@ import com.birdy.blogbackend.domain.vo.response.BaseResponse;
 import com.birdy.blogbackend.domain.vo.response.TencentCaptchaResponse;
 import com.birdy.blogbackend.exception.BusinessException;
 import com.birdy.blogbackend.service.MailService;
+import com.birdy.blogbackend.service.PermissionService;
 import com.birdy.blogbackend.service.PhotoService;
 import com.birdy.blogbackend.service.UserService;
 import com.birdy.blogbackend.util.CaffeineFactory;
@@ -59,19 +61,22 @@ import static com.birdy.blogbackend.constant.UserConstant.LOGIN_TOKEN;
 @Slf4j
 public class UserController {
     public static TencentCaptchaUtil TENCENT_CAPTCHA_UTIL = null;
-    @Autowired
-    private UserService userService;
+
+    public static final Cache<String, User> FORGET_PASSWORD_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
     private static final Cache<String, String> MAIL_CODE_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
-    @Autowired
-    private ConfigProperties configProperties;
     private static final Cache<String, Integer> MAIL_FAIL_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(3, TimeUnit.MINUTES).build();
     private static final Cache<String, Integer> PHONE_FAIL_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
-    public static final Cache<String, User> FORGET_PASSWORD_CACHE = CaffeineFactory.INSTANCE.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
 
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private ConfigProperties configProperties;
     @Autowired
     private MailService mailService;
     @Autowired
     private PhotoService photoService;
+    @Autowired
+    private PermissionService permissionService;
     @Autowired
     private AliyunSmsUtil aliyunSmsUtil;
 
@@ -244,6 +249,9 @@ public class UserController {
         User user = userService.getUserByToken(token, request);
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
+        long uid = user.getUid();
+        Permission ret = permissionService.getMaxPriorityGroupP(uid);
+        userVO.setGroup(ret);
         // 刷新token
         token = userService.refreshToken(user, request);
         userVO.setToken(token);
@@ -310,20 +318,6 @@ public class UserController {
         User user = userService.getUserByToken(token, request);
         userService.setupAvatar(user, file, request);
         return ResultUtil.ok(true);
-    }
-
-    @RequestMapping("/getlogin")
-    public ResponseEntity<BaseResponse<UserVO>> getLogin(HttpServletRequest request) {
-        // 从请求头获取token
-        String token = request.getHeader(LOGIN_TOKEN);
-        if (token == null) {
-            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
-        }
-        // 通过token获取用户
-        User user = userService.getUserByToken(token, request);
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        return ResultUtil.ok(userVO);
     }
 
     @GetMapping("/profile/{uid}")

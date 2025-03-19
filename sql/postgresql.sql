@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS "user"
     status     INTEGER   DEFAULT 0                 NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available INTEGER DEFAULT 1 NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "permission"
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS "permission"
     expiry     BIGINT    DEFAULT 0                 NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available INTEGER DEFAULT 1 NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "oauth"
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS "oauth"
     token      VARCHAR(64)                         NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available INTEGER DEFAULT 1 NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "log"
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS "log"
     cost       BIGINT                              NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available INTEGER DEFAULT 1 NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "security_log"
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS "security_log"
     info       TEXT                                NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available INTEGER DEFAULT 1 NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "orders"
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS "orders"
     trade_status   INTEGER   DEFAULT 0                 NOT NULL,
     create_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available     BOOLEAN   DEFAULT TRUE              NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "blacklist"
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS "blacklist"
     reason     VARCHAR(256)                        NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available INTEGER DEFAULT 1 NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "photo"
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS "photo"
     size       BIGINT                              NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available INTEGER DEFAULT 1 NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "2fa"
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS "2fa"
     force_enable BOOLEAN   DEFAULT FALSE             NOT NULL,
     create_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available   BOOLEAN   DEFAULT TRUE              NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "invite_code"
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS "invite_code"
     times         INTEGER   DEFAULT 0                 NOT NULL,
     create_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available     BOOLEAN   DEFAULT TRUE              NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "invite_record"
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS "invite_record"
     code       VARCHAR(16)                         NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available INTEGER DEFAULT 1 NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "article"
@@ -164,5 +164,24 @@ CREATE TABLE IF NOT EXISTS "article_comment"
     content     TEXT                                NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    available   INTEGER   DEFAULT 1                 NOT NULL
+    available INTEGER DEFAULT 0 NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "modpack"
+(
+    id               BIGSERIAL PRIMARY KEY,
+    uid              BIGINT                              NOT NULL,
+    logo_id          BIGINT                              NOT NULL,
+    launch_arguments TEXT                                NULL,
+    brief            TEXT                                NOT NULL,
+    client           VARCHAR(256)                        NOT NULL,
+    version          VARCHAR(64)                         NOT NULL,
+    file_path        VARCHAR(256)                        NOT NULL,
+    file_size        BIGINT                              NOT NULL,
+    md5              VARCHAR(32)                         NOT NULL,
+    status           INTEGER   DEFAULT 0                 NOT NULL,
+    reason           TEXT                                NULL,
+    create_time      TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time      TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    available        INTEGER   DEFAULT 0                 NOT NULL
 );
