@@ -151,6 +151,7 @@ CREATE TABLE IF NOT EXISTS "article"
     content     TEXT                                NOT NULL,
     tags        TEXT                                NULL,
     views       BIGINT    DEFAULT 1                 NOT NULL,
+    status INTEGER DEFAULT 0 NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available INTEGER DEFAULT 1 NOT NULL
@@ -184,4 +185,26 @@ CREATE TABLE IF NOT EXISTS "modpack"
     create_time      TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time      TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     available        INTEGER   DEFAULT 0                 NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "visitor"
+(
+    date        TIMESTAMP PRIMARY KEY,
+    count       INTEGER                             NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    available   INTEGER   DEFAULT 0                 NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "report"
+(
+    id          BIGSERIAL PRIMARY KEY,
+    reporter    BIGINT                              NOT NULL,
+    item_id     BIGINT                              NOT NULL,
+    type        INTEGER                             NOT NULL,
+    reason      TEXT                                NOT NULL,
+    status      INTEGER   DEFAULT 0                 NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    available   INTEGER   DEFAULT 0                 NOT NULL
 );

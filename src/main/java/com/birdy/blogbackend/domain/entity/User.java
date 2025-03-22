@@ -28,7 +28,7 @@ public class User implements Serializable {
      */
     @Id(keyType = KeyType.Auto)
     @Schema(description = "ID")
-    @ExcelProperty(value = "UD", index = 0)
+    @ExcelProperty(value = "UID", index = 0)
     private Long uid;
 
     @Schema(description = "用户名")

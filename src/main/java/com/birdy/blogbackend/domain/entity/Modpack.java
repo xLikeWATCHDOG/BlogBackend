@@ -72,7 +72,7 @@ public class Modpack implements Serializable {
 
     @Schema(description = "状态")
     @ExcelProperty(value = "状态", index = 10)
-    private Integer status = ModpackStatus.WAITING.getCode();
+    private Integer status;
 
     @Schema(description = "原因")
     @ExcelProperty(value = "原因", index = 11)

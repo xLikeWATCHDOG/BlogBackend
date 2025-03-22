@@ -1,7 +1,6 @@
 package com.birdy.blogbackend.domain.dto;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.birdy.blogbackend.domain.enums.ModpackStatus;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
@@ -70,7 +69,7 @@ public class ModpackVO implements Serializable {
 
     @Schema(description = "状态")
     @ExcelProperty(value = "状态", index = 10)
-    private Integer status = ModpackStatus.WAITING.getCode();
+    private Integer status;
 
     @Schema(description = "原因")
     @ExcelProperty(value = "原因", index = 11)

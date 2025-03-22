@@ -56,13 +56,13 @@ dependencies {
     implementation("com.mybatis-flex:mybatis-flex-spring-boot-starter:1.10.8")
     implementation("org.mybatis:mybatis-spring:3.0.4")
 
-    compileOnly("org.projectlombok:lombok")
+    implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    compileOnly("org.aspectj:aspectjweaver:1.9.22.1")
-    compileOnly("org.aspectj:aspectjtools:1.9.22.1")
-    compileOnly("cn.hutool:hutool-all:5.8.36")
-    compileOnly("com.google.code.gson:gson:2.12.1")
+    implementation("org.aspectj:aspectjweaver:1.9.22.1")
+    implementation("org.aspectj:aspectjtools:1.9.22.1")
+    implementation("cn.hutool:hutool-all:5.8.36")
+    implementation("com.google.code.gson:gson:2.12.1")
 
     runtimeOnly("org.postgresql:postgresql")
 

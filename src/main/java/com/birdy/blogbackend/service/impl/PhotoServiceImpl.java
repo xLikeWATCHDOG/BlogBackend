@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -22,8 +21,6 @@ import java.nio.file.Path;
 @Service
 @Slf4j
 public class PhotoServiceImpl implements PhotoService {
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
     @Autowired
     private PhotoDao photoDao;
 

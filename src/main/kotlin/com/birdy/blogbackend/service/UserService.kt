@@ -39,4 +39,9 @@ interface UserService : IService<User?> {
     @Async
     fun downloadAvatar(user: User, avatarUrl: String, request: HttpServletRequest)
     fun setupAvatar(user: User, file: MultipartFile, request: HttpServletRequest)
+    fun countToday(): Long
+    fun getAdmins(): List<User>
+
+    @Async
+    fun sendReportMailToAdmin(code: String, content: String, request: HttpServletRequest)
 }

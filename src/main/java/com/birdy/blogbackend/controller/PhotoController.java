@@ -22,6 +22,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * @author birdy
+ */
 @RestController
 @RequestMapping("/photo")
 @Slf4j

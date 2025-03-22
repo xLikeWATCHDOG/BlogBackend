@@ -1,6 +1,7 @@
 package com.birdy.blogbackend.domain.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.birdy.blogbackend.domain.enums.ArticleStatus;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
@@ -57,12 +58,16 @@ public class Article implements Serializable {
     @ExcelProperty(value = "浏览量", index = 7)
     private Long views;
 
+    @Schema(description = "状态")
+    @ExcelProperty(value = "状态", index = 8)
+    private Integer status;
+
     @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 4)
+    @ExcelProperty(value = "创建时间", index = 9)
     private Date createTime;
 
     @Schema(description = "更新时间")
-    @ExcelProperty(value = "更新时间", index = 5)
+    @ExcelProperty(value = "更新时间", index = 10)
     @Column(onUpdateValue = "now()")
     private Date updateTime;
 
@@ -70,4 +75,12 @@ public class Article implements Serializable {
     @ExcelProperty(value = "可用性", index = 6)
     @Column(isLogicDelete = true)
     private Integer available;
+
+    public ArticleStatus getArticleStatus() {
+        return ArticleStatus.valueOf(status);
+    }
+
+    public void setArticleStatus(ArticleStatus articleStatus) {
+        this.status = articleStatus.getCode();
+    }
 }

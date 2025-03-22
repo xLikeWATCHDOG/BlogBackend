@@ -6,6 +6,7 @@ import cn.hutool.extra.servlet.JakartaServletUtil;
 import com.birdy.blogbackend.domain.entity.Log;
 import com.birdy.blogbackend.domain.vo.response.BaseResponse;
 import com.birdy.blogbackend.service.LogService;
+import com.birdy.blogbackend.service.VisitorService;
 import com.birdy.blogbackend.util.gson.GsonProvider;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class LogAspect {
     @Autowired
     private LogService logService;
+    @Autowired
+    private VisitorService visitorService;
 
     /**
      * 执行拦截
@@ -88,6 +91,7 @@ public class LogAspect {
                 .cost(totalTimeMillis)
                 .build();
         logService.save(l);
+        visitorService.addOne();
         return result;
     }
 }

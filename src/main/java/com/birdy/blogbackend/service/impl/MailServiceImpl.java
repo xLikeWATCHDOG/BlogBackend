@@ -1,5 +1,8 @@
 package com.birdy.blogbackend.service.impl;
 
+import com.birdy.blogbackend.dao.UserDao;
+import com.birdy.blogbackend.domain.entity.Report;
+import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
 import com.birdy.blogbackend.exception.BusinessException;
 import com.birdy.blogbackend.service.MailService;
@@ -8,6 +11,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -32,6 +36,8 @@ public class MailServiceImpl implements MailService {
     private JavaMailSender javaMailSender;
     @Autowired
     private TemplateEngine templateEngine;
+    @Autowired
+    private UserDao userDao;
     @Value("${spring.mail.username:username@gmail.com}")
     private String from;
     @Value("${website.url}")
@@ -51,6 +57,51 @@ public class MailServiceImpl implements MailService {
             Context context = new Context();
             context.setVariable("code", code);
             String text = templateEngine.process("EmailCode", context);
+            helper.setText(text, true);
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            log.error("邮件发送失败，邮箱：{}，错误信息：{}", to, e.getMessage());
+            throw new BusinessException(ReturnCode.SYSTEM_ERROR, "邮件发送失败，请稍后重试", null);
+        }
+    }
+
+    @Async
+    @Override
+    public void sendThanksMail(@NotNull String to, @NotNull String code, @NotNull HttpServletRequest request) {
+        checkEmail(to);
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("感谢您的举报");
+            helper.setCc(from);
+            Context context = new Context();
+            context.setVariable("reportId", code);
+            String text = templateEngine.process("ThanksReport", context);
+            helper.setText(text, true);
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            log.error("邮件发送失败，邮箱：{}，错误信息：{}", to, e.getMessage());
+            throw new BusinessException(ReturnCode.SYSTEM_ERROR, "邮件发送失败，请稍后重试", null);
+        }
+    }
+
+    @Async
+    @Override
+    public void sendThanksMailToAdmin(@NotNull String to, @NotNull String code, @NotNull String content, @NotNull HttpServletRequest request) {
+        checkEmail(to);
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("收到一份新的举报");
+            helper.setCc(from);
+            Context context = new Context();
+            context.setVariable("reportId", code);
+            context.setVariable("content", content);
+            String text = templateEngine.process("ThanksReportToAdmin", context);
             helper.setText(text, true);
             javaMailSender.send(message);
         } catch (Exception e) {
@@ -86,6 +137,36 @@ public class MailServiceImpl implements MailService {
         Boolean sent = emailSent.getIfPresent(to);
         if (sent != null) {
             throw new BusinessException(ReturnCode.TOO_MANY_REQUESTS_ERROR, "邮箱发送过于频繁", null);
+        }
+    }
+
+    @Async
+    @Override
+    public void sendReportChangeMailToUser(@NotNull Report report, @NotNull HttpServletRequest request) {
+        long reporter = report.getReporter();
+        User user = userDao.getById(reporter);
+        if (user == null) {
+            log.error("用户不存在，uid：{}", reporter);
+            return;
+        }
+        String to = user.getEmail();
+        checkEmail(to);
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("您的举报状态已变更");
+            helper.setCc(from);
+            Context context = new Context();
+            context.setVariable("reportId", report.getId());
+            context.setVariable("process", report.getReportStatus().getDescription());
+            String text = templateEngine.process("ReportStatusChange", context);
+            helper.setText(text, true);
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            log.error("邮件发送失败，邮箱：{}，错误信息：{}", to, e.getMessage());
+            throw new BusinessException(ReturnCode.SYSTEM_ERROR, "邮件发送失败，请稍后重试", null);
         }
     }
 }

@@ -4,4 +4,5 @@ import com.birdy.blogbackend.domain.entity.Article
 import com.mybatisflex.core.service.IService
 
 interface ArticleService : IService<Article?> {
+    fun countToday(): Long
 }

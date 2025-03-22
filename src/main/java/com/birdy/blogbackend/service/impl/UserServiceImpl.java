@@ -2,6 +2,7 @@ package com.birdy.blogbackend.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.birdy.blogbackend.dao.OAuthDao;
+import com.birdy.blogbackend.dao.PermissionDao;
 import com.birdy.blogbackend.dao.UserDao;
 import com.birdy.blogbackend.domain.entity.OAuth;
 import com.birdy.blogbackend.domain.entity.User;
@@ -13,6 +14,8 @@ import com.birdy.blogbackend.domain.vo.request.phone.PhoneLoginRequest;
 import com.birdy.blogbackend.domain.vo.request.user.UserLoginRequest;
 import com.birdy.blogbackend.domain.vo.request.user.UserRegisterRequest;
 import com.birdy.blogbackend.exception.BusinessException;
+import com.birdy.blogbackend.service.MailService;
+import com.birdy.blogbackend.service.PermissionService;
 import com.birdy.blogbackend.service.PhotoService;
 import com.birdy.blogbackend.service.UserService;
 import com.birdy.blogbackend.util.*;
@@ -45,9 +48,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.birdy.blogbackend.constant.UserConstant.LOGIN_TOKEN;
@@ -69,6 +71,12 @@ public class UserServiceImpl implements UserService {
     private PhotoService photoService;
     @Autowired
     private OAuthDao oAuthDao;
+    @Autowired
+    private PermissionDao permissionDao;
+    @Autowired
+    private PermissionService permissionService;
+    @Autowired
+    private MailService mailService;
 
     private void validateUserCredentials(String userName, String userPassword, HttpServletRequest request) {
         if (StringUtils.isAnyBlank(userName, userPassword)) {
@@ -577,4 +585,30 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public long countToday() {
+        // 记录今天的登录人数
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("to_char(create_time, 'YYYY-MM-DD')", "to_char(CURRENT_DATE, 'YYYY-MM-DD')");
+        return this.count(queryWrapper);
+    }
+
+    @Override
+    public @NotNull List<User> getAdmins() {
+        List<User> ret = new ArrayList<>();
+        for (User user : this.list()) {
+            if (permissionService.checkPermission(user.getUid(), "group.admin")) {
+                ret.add(user);
+            }
+        }
+        return ret;
+    }
+
+    @Async
+    @Override
+    public void sendReportMailToAdmin(@NotNull String code, @NotNull String content, @NotNull HttpServletRequest request) {
+        for (User admin : getAdmins()) {
+            mailService.sendThanksMailToAdmin(admin.getEmail(), code, content, request);
+        }
+    }
 }

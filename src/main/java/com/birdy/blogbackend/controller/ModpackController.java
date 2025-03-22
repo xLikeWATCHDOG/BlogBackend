@@ -1,5 +1,6 @@
 package com.birdy.blogbackend.controller;
 
+import com.birdy.blogbackend.annotation.AuthCheck;
 import com.birdy.blogbackend.config.ConfigProperties;
 import com.birdy.blogbackend.domain.ResultUtil;
 import com.birdy.blogbackend.domain.dto.ModpackVO;
@@ -7,11 +8,13 @@ import com.birdy.blogbackend.domain.entity.Modpack;
 import com.birdy.blogbackend.domain.entity.Photo;
 import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
+import com.birdy.blogbackend.domain.vo.request.ModpackChangeStatusRequest;
 import com.birdy.blogbackend.domain.vo.request.ModpackQueryRequest;
 import com.birdy.blogbackend.domain.vo.response.BaseResponse;
 import com.birdy.blogbackend.domain.vo.response.TencentCaptchaResponse;
 import com.birdy.blogbackend.exception.BusinessException;
 import com.birdy.blogbackend.service.ModpackService;
+import com.birdy.blogbackend.service.PermissionService;
 import com.birdy.blogbackend.service.PhotoService;
 import com.birdy.blogbackend.service.UserService;
 import com.birdy.blogbackend.util.gson.GsonProvider;
@@ -23,11 +26,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,6 +61,8 @@ public class ModpackController {
     private UserService userService;
     @Autowired
     private ModpackService modpackService;
+    @Autowired
+    private PermissionService permissionService;
 
     public void checkCaptcha(HttpServletRequest request) {
         if (!configProperties.captcha.isEnable()) {
@@ -147,13 +157,18 @@ public class ModpackController {
         }
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<BaseResponse<Page<ModpackVO>>> getModpackList(ModpackQueryRequest modpackQueryRequest, HttpServletRequest request) {
+    @PostMapping("/list")
+    public ResponseEntity<BaseResponse<Page<ModpackVO>>> getModpackList(@RequestBody ModpackQueryRequest modpackQueryRequest, HttpServletRequest request) {
         String token = request.getHeader(LOGIN_TOKEN);
         User user = userService.getUserByToken(token, request);
 
         QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("uid", user.getUid());
+        if (!modpackQueryRequest.getAdmin()) {
+            queryWrapper.eq("uid", user.getUid());
+        } else {
+            queryWrapper.eq("uid", modpackQueryRequest.getUid());
+        }
+        queryWrapper.eq("status", modpackQueryRequest.getStatus());
 
         Page<Modpack> page = modpackService.getMapper()
                 .paginate(Page.of(modpackQueryRequest.getCurrent(), modpackQueryRequest.getPageSize()), queryWrapper);
@@ -172,10 +187,60 @@ public class ModpackController {
         String token = request.getHeader(LOGIN_TOKEN);
         User user = userService.getUserByToken(token, request);
         Modpack modpack = modpackService.getById(id);
+        if (modpack.getUid().equals(user.getUid()) && !permissionService.checkPermission(user.getUid(), "group.admin")) {
+            throw new BusinessException(ReturnCode.FORBIDDEN_ERROR, "You are not allowed to delete this modpack", request);
+        }
         if (modpack == null) {
             throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "Modpack not found", request);
         }
         modpackService.removeById(id);
         return ResultUtil.ok(id);
+    }
+
+
+    @AuthCheck(must = "group.admin")
+    @PostMapping("/status")
+    public ResponseEntity<BaseResponse<Boolean>> status(@RequestBody ModpackChangeStatusRequest modpackChangeStatusRequest, HttpServletRequest request) {
+        Modpack modpack = modpackService.getById(modpackChangeStatusRequest.getId());
+        if (modpack == null) {
+            throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "Report not found", request);
+        }
+        modpack.setStatus(modpackChangeStatusRequest.getStatus());
+        if (modpack.getReason() != null) {
+            modpack.setReason(modpackChangeStatusRequest.getReason());
+        }
+        modpackService.updateById(modpack);
+        return ResultUtil.ok(true);
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<InputStreamResource> downloadModpack(@PathVariable("id") Long id, HttpServletRequest request) {
+        Modpack modpack = modpackService.getById(id);
+        if (modpack == null) {
+            throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "Modpack not found", request);
+        }
+
+        // Assuming modpack has a filePath property pointing to the file location
+        Path path = Path.of("modpacks", modpack.getFilePath());
+        File modpackFile = path.toFile();
+        if (!modpackFile.exists() || !modpackFile.isFile()) {
+            throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "File not found for the modpack", request);
+        }
+
+        try {
+            // Set up the file for download
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + modpackFile.getName() + "\"");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
+            headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(modpackFile.length()));
+
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(modpackFile));
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(resource);
+        } catch (FileNotFoundException e) {
+            throw new BusinessException(ReturnCode.SYSTEM_ERROR, "Error reading the file", request);
+        }
     }
 }
