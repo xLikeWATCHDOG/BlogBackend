@@ -18,40 +18,40 @@ import java.util.Date;
 @Table("2fa")
 @Data
 public class OneTimePassword implements Serializable {
-    @Serial
-    @Column(ignore = true)
-    private static final long serialVersionUID = 1L;
+  @Serial
+  @Column(ignore = true)
+  private static final long serialVersionUID = 1L;
 
-    /**
-     * id
-     */
-    @Id(keyType = KeyType.Auto)
-    @Schema(description = "ID")
-    @ExcelProperty(value = "ID", index = 0)
-    private Long id;
+  /**
+   * id
+   */
+  @Id(keyType = KeyType.Auto)
+  @Schema(description = "ID")
+  @ExcelProperty(value = "ID", index = 0)
+  private Long id;
 
-    @Schema(description = "UID")
-    @ExcelProperty(value = "UID", index = 1)
-    private Long uid;
+  @Schema(description = "UID")
+  @ExcelProperty(value = "UID", index = 1)
+  private Long uid;
 
-    @Schema(description = "2FA密钥")
-    @ExcelProperty(value = "2FA密钥", index = 2)
-    private String secret;
+  @Schema(description = "2FA密钥")
+  @ExcelProperty(value = "2FA密钥", index = 2)
+  private String secret;
 
-    @Schema(description = "强制开启")
-    @ExcelProperty(value = "强制开启", index = 3)
-    private Boolean forceEnable;
+  @Schema(description = "强制开启")
+  @ExcelProperty(value = "强制开启", index = 3)
+  private Boolean forceEnable;
 
-    @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 4)
-    private Date createTime;
+  @Schema(description = "创建时间")
+  @ExcelProperty(value = "创建时间", index = 4)
+  private Date createTime;
 
-    @Schema(description = "更新时间")
-    @ExcelProperty(value = "更新时间", index = 5)
-    private Date updateTime;
+  @Schema(description = "更新时间")
+  @ExcelProperty(value = "更新时间", index = 5)
+  private Date updateTime;
 
-    @Schema(description = "可用性")
-    @ExcelProperty(value = "可用性", index = 6)
-    @Column(isLogicDelete = true)
-    private Integer available;
+  @Schema(description = "可用性")
+  @ExcelProperty(value = "可用性", index = 6)
+  @Column(isLogicDelete = true)
+  private Integer available;
 }

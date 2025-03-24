@@ -35,67 +35,67 @@ import java.util.List;
 @RequestMapping("/oauth")
 @Slf4j
 public class OAuthController {
-    @Autowired
-    private ConfigProperties configProperties;
-    @Value("${website}")
-    private String websiteUrl;
-    @Autowired
-    private UserService userService;
+  @Autowired
+  private ConfigProperties configProperties;
+  @Value("${website}")
+  private String websiteUrl;
+  @Autowired
+  private UserService userService;
 
 
-    @GetMapping("/github")
-    public ResponseEntity<BaseResponse<String>> github(HttpServletRequest request, HttpServletResponse response) {
-        AuthGithubRequest authGithubRequest = getAuthGithubRequest();
-        String url = authGithubRequest.authorize(AuthStateUtils.createState());
-        // 直接重定向到url
-        try {
-            if (configProperties.getGithub().isEnable()) {
-                response.sendRedirect(url);
-            } else {
-                response.sendRedirect(websiteUrl);
-            }
-        } catch (IOException e) {
-            throw new BusinessException(ReturnCode.OPERATION_ERROR, "Failed to redirect to Github", request);
-        }
-        return ResultUtil.ok(url);
+  @GetMapping("/github")
+  public ResponseEntity<BaseResponse<String>> github(HttpServletRequest request, HttpServletResponse response) {
+    AuthGithubRequest authGithubRequest = getAuthGithubRequest();
+    String url = authGithubRequest.authorize(AuthStateUtils.createState());
+    // 直接重定向到url
+    try {
+      if (configProperties.getGithub().isEnable()) {
+        response.sendRedirect(url);
+      } else {
+        response.sendRedirect(websiteUrl);
+      }
+    } catch (IOException e) {
+      throw new BusinessException(ReturnCode.OPERATION_ERROR, "Failed to redirect to Github", request);
     }
+    return ResultUtil.ok(url);
+  }
 
-    @RequestMapping("/github/callback")
-    public ResponseEntity<BaseResponse<String>> githubCallback(AuthCallback callback, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            AuthGithubRequest authGithubRequest = getAuthGithubRequest();
-            AuthResponse<AuthUser> authResponse = authGithubRequest.login(callback);
-            AuthUser authUser = authResponse.getData();
-            User user = userService.oAuthLogin(authUser, OAuthPlatform.GITHUB, request);
-        } catch (Throwable ignored) {
-        }
-        // 重定向到前端页面
-        try {
-            response.sendRedirect(websiteUrl);
-        } catch (IOException e) {
-            throw new BusinessException(ReturnCode.OPERATION_ERROR, "Failed to redirect to website", request);
-        }
-        return ResultUtil.ok("Request is being processed");
+  @RequestMapping("/github/callback")
+  public ResponseEntity<BaseResponse<String>> githubCallback(AuthCallback callback, HttpServletRequest request, HttpServletResponse response) {
+    try {
+      AuthGithubRequest authGithubRequest = getAuthGithubRequest();
+      AuthResponse<AuthUser> authResponse = authGithubRequest.login(callback);
+      AuthUser authUser = authResponse.getData();
+      User user = userService.oAuthLogin(authUser, OAuthPlatform.GITHUB, request);
+    } catch (Throwable ignored) {
     }
+    // 重定向到前端页面
+    try {
+      response.sendRedirect(websiteUrl);
+    } catch (IOException e) {
+      throw new BusinessException(ReturnCode.OPERATION_ERROR, "Failed to redirect to website", request);
+    }
+    return ResultUtil.ok("Request is being processed");
+  }
 
-    public AuthGithubRequest getAuthGithubRequest() {
-        return new AuthGithubRequest(AuthConfig.builder()
-                .clientId(configProperties.getGithub().getClientId())
-                .clientSecret(configProperties.getGithub().getClientSecret())
-                .redirectUri(configProperties.getGithub().getRedirectUri())
-                .build());
-    }
+  public AuthGithubRequest getAuthGithubRequest() {
+    return new AuthGithubRequest(AuthConfig.builder()
+      .clientId(configProperties.getGithub().getClientId())
+      .clientSecret(configProperties.getGithub().getClientSecret())
+      .redirectUri(configProperties.getGithub().getRedirectUri())
+      .build());
+  }
 
-    @RequestMapping("/list")
-    public ResponseEntity<BaseResponse<List<String>>> list(HttpServletRequest request) {
-        // 判断是否启用
-        List<String> str = new ArrayList<>();
-        if (configProperties.getGithub().isEnable()) {
-            str.add("github");
-        }
-        if (configProperties.getQq().isEnable()) {
-            str.add("qq");
-        }
-        return ResultUtil.ok(str);
+  @RequestMapping("/list")
+  public ResponseEntity<BaseResponse<List<String>>> list(HttpServletRequest request) {
+    // 判断是否启用
+    List<String> str = new ArrayList<>();
+    if (configProperties.getGithub().isEnable()) {
+      str.add("github");
     }
+    if (configProperties.getQq().isEnable()) {
+      str.add("qq");
+    }
+    return ResultUtil.ok(str);
+  }
 }

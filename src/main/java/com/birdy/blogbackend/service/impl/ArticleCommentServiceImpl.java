@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ArticleCommentServiceImpl implements ArticleCommentService {
-    @Autowired
-    private ArticleCommentDao articleCommentDao;
+  @Autowired
+  private ArticleCommentDao articleCommentDao;
 
-    @Override
-    public BaseMapper<ArticleComment> getMapper() {
-        return articleCommentDao.getMapper();
-    }
+  @Override
+  public BaseMapper<ArticleComment> getMapper() {
+    return articleCommentDao.getMapper();
+  }
 }

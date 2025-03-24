@@ -10,8 +10,8 @@ import java.io.Serializable;
  */
 @Data
 public class PermissionRemoveRequest implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private Long uid;
-    private String permission;
+  @Serial
+  private static final long serialVersionUID = 1L;
+  private Long uid;
+  private String permission;
 }

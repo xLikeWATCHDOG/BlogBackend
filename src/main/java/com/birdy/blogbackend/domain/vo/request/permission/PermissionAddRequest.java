@@ -10,9 +10,9 @@ import java.io.Serializable;
  */
 @Data
 public class PermissionAddRequest implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private Long uid;
-    private String permission;
-    private Long expiry;
+  @Serial
+  private static final long serialVersionUID = 1L;
+  private Long uid;
+  private String permission;
+  private Long expiry;
 }

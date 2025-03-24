@@ -14,12 +14,12 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class PermissionQueryRequest extends PageRequest implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private Long id;
-    private Long uid;
-    private String permission;
-    private Long expiry;
-    private Date createTime;
-    private Date updateTime;
+  @Serial
+  private static final long serialVersionUID = 1L;
+  private Long id;
+  private Long uid;
+  private String permission;
+  private Long expiry;
+  private Date createTime;
+  private Date updateTime;
 }

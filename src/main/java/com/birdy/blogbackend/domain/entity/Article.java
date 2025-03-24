@@ -19,68 +19,68 @@ import java.util.Date;
 @Table("article")
 @Data
 public class Article implements Serializable {
-    @Serial
-    @Column(ignore = true)
-    private static final long serialVersionUID = 1L;
-    /**
-     * id
-     */
-    @Id(keyType = KeyType.Auto)
-    @Schema(description = "ID")
-    @ExcelProperty(value = "ID", index = 0)
-    public Long id;
+  @Serial
+  @Column(ignore = true)
+  private static final long serialVersionUID = 1L;
+  /**
+   * id
+   */
+  @Id(keyType = KeyType.Auto)
+  @Schema(description = "ID")
+  @ExcelProperty(value = "ID", index = 0)
+  public Long id;
 
-    @Schema(description = "用户ID")
-    @ExcelProperty(value = "用户ID", index = 1)
-    private Long uid;
+  @Schema(description = "用户ID")
+  @ExcelProperty(value = "用户ID", index = 1)
+  private Long uid;
 
-    @Schema(description = "照片ID")
-    @ExcelProperty(value = "照片ID", index = 2)
-    private Long pid;
+  @Schema(description = "照片ID")
+  @ExcelProperty(value = "照片ID", index = 2)
+  private Long pid;
 
-    @Schema(description = "标题")
-    @ExcelProperty(value = "标题", index = 3)
-    private String title;
+  @Schema(description = "标题")
+  @ExcelProperty(value = "标题", index = 3)
+  private String title;
 
-    @Schema(description = "描述")
-    @ExcelProperty(value = "描述", index = 4)
-    private String description;
+  @Schema(description = "描述")
+  @ExcelProperty(value = "描述", index = 4)
+  private String description;
 
-    @Schema(description = "内容")
-    @ExcelProperty(value = "内容", index = 5)
-    private String content;
+  @Schema(description = "内容")
+  @ExcelProperty(value = "内容", index = 5)
+  private String content;
 
-    @Schema(description = "标签")
-    @ExcelProperty(value = "标签", index = 6)
-    private String tags;
+  @Schema(description = "标签")
+  @ExcelProperty(value = "标签", index = 6)
+  private String tags;
 
-    @Schema(description = "浏览量")
-    @ExcelProperty(value = "浏览量", index = 7)
-    private Long views;
+  @Schema(description = "浏览量")
+  @ExcelProperty(value = "浏览量", index = 7)
+  private Long views;
 
-    @Schema(description = "状态")
-    @ExcelProperty(value = "状态", index = 8)
-    private Integer status;
+  @Schema(description = "状态")
+  @ExcelProperty(value = "状态", index = 8)
+  private Integer status;
 
-    @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 9)
-    private Date createTime;
+  @Schema(description = "创建时间")
+  @ExcelProperty(value = "创建时间", index = 9)
+  private Date createTime;
 
-    @Schema(description = "更新时间")
-    @ExcelProperty(value = "更新时间", index = 10)
-    @Column(onUpdateValue = "now()")
-    private Date updateTime;
+  @Schema(description = "更新时间")
+  @ExcelProperty(value = "更新时间", index = 10)
+  @Column(onUpdateValue = "now()")
+  private Date updateTime;
 
-    @Schema(description = "可用性")
-    @ExcelProperty(value = "可用性", index = 6)
-    @Column(isLogicDelete = true)
-    private Integer available;
+  @Schema(description = "可用性")
+  @ExcelProperty(value = "可用性", index = 6)
+  @Column(isLogicDelete = true)
+  private Integer available;
 
-    public ArticleStatus getArticleStatus() {
-        return ArticleStatus.valueOf(status);
-    }
+  public ArticleStatus getArticleStatus() {
+    return ArticleStatus.valueOf(status);
+  }
 
-    public void setArticleStatus(ArticleStatus articleStatus) {
-        this.status = articleStatus.getCode();
-    }
+  public void setArticleStatus(ArticleStatus articleStatus) {
+    this.status = articleStatus.getCode();
+  }
 }

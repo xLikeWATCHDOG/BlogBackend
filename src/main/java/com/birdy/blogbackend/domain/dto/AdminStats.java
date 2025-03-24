@@ -17,18 +17,18 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdminStats implements Serializable {
-    @Serial
-    @Column(ignore = true)
-    private static final long serialVersionUID = 1L;
+  @Serial
+  @Column(ignore = true)
+  private static final long serialVersionUID = 1L;
 
-    private Long userCount;
-    private Long articleCount;
-    private Long modpackCount;
-    private Long commentCount;
-    private Long viewCount;
-    private Long newUserCount;
-    private Long newArticleCount;
-    private Long newModpackCount;
-    private Long pendingModpackCount;
-    private Long reported;
+  private Long userCount;
+  private Long articleCount;
+  private Long modpackCount;
+  private Long commentCount;
+  private Long viewCount;
+  private Long newUserCount;
+  private Long newArticleCount;
+  private Long newModpackCount;
+  private Long pendingModpackCount;
+  private Long reported;
 }

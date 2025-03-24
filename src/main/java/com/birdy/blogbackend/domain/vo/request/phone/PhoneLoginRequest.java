@@ -10,9 +10,9 @@ import java.io.Serializable;
  */
 @Data
 public class PhoneLoginRequest implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private String phone;
-    private String code;
+  private String phone;
+  private String code;
 }

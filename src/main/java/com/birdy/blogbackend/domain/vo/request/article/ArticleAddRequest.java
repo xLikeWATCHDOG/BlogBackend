@@ -10,14 +10,14 @@ import java.io.Serializable;
  */
 @Data
 public class ArticleAddRequest implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private String title;
+  private String title;
 
-    private String summary;
+  private String summary;
 
-    private String content;
+  private String content;
 
-    private String[] tags;
+  private String[] tags;
 }

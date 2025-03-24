@@ -10,15 +10,15 @@ import java.io.Serializable;
  */
 @Data
 public class TencentCaptchaResponse implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private int ret;
-    private String ticket;
-    /**
-     * 腾讯云验证码应用ID
-     */
-    private Long appid;
-    private String sid;
-    private String randstr;
+  private int ret;
+  private String ticket;
+  /**
+   * 腾讯云验证码应用ID
+   */
+  private Long appid;
+  private String sid;
+  private String randstr;
 }

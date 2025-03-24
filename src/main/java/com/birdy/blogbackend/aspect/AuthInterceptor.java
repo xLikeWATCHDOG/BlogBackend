@@ -31,47 +31,47 @@ import static com.birdy.blogbackend.constant.UserConstant.LOGIN_TOKEN;
 @Aspect
 @Component
 public class AuthInterceptor {
-    @Resource
-    private UserService userService;
-    @Resource
-    private PermissionService permissionService;
+  @Resource
+  private UserService userService;
+  @Resource
+  private PermissionService permissionService;
 
-    /**
-     * 执行拦截
-     */
-    @Around("@annotation(authCheck)")
-    public Object doInterceptor(ProceedingJoinPoint joinPoint, AuthCheck authCheck) throws Throwable {
-        List<String> any = Arrays.stream(authCheck.any()).filter(StringUtils::isNotBlank).toList();
-        List<String> must = Arrays.stream(authCheck.must()).filter(StringUtils::isNotBlank).toList();
+  /**
+   * 执行拦截
+   */
+  @Around("@annotation(authCheck)")
+  public Object doInterceptor(ProceedingJoinPoint joinPoint, AuthCheck authCheck) throws Throwable {
+    List<String> any = Arrays.stream(authCheck.any()).filter(StringUtils::isNotBlank).toList();
+    List<String> must = Arrays.stream(authCheck.must()).filter(StringUtils::isNotBlank).toList();
 
-        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+    RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+    HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 
-        // 当前登录用户
-        // 从请求头获取token
-        String token = request.getHeader(LOGIN_TOKEN);
-        if (token == null) {
-            throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
-        }
-        // 通过token获取用户
-        User user = userService.getUserByToken(token, request);
-        long uid = user.getUid();
-
-        // 拥有任意权限即通过
-        if (CollectionUtils.isNotEmpty(any)) {
-            if (any.stream().noneMatch(per -> permissionService.checkPermission(uid, per))) {
-                throw new BusinessException(ReturnCode.FORBIDDEN_ERROR, "无权限", request);
-            }
-        }
-
-        // 必须有所有权限才通过
-        if (CollectionUtils.isNotEmpty(must)) {
-            if (must.stream().anyMatch(per -> !permissionService.checkPermission(uid, per))) {
-                throw new BusinessException(ReturnCode.FORBIDDEN_ERROR, "无权限", request);
-            }
-        }
-
-        // 通过权限校验，放行
-        return joinPoint.proceed();
+    // 当前登录用户
+    // 从请求头获取token
+    String token = request.getHeader(LOGIN_TOKEN);
+    if (token == null) {
+      throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
     }
+    // 通过token获取用户
+    User user = userService.getUserByToken(token, request);
+    long uid = user.getUid();
+
+    // 拥有任意权限即通过
+    if (CollectionUtils.isNotEmpty(any)) {
+      if (any.stream().noneMatch(per -> permissionService.checkPermission(uid, per))) {
+        throw new BusinessException(ReturnCode.FORBIDDEN_ERROR, "无权限", request);
+      }
+    }
+
+    // 必须有所有权限才通过
+    if (CollectionUtils.isNotEmpty(must)) {
+      if (must.stream().anyMatch(per -> !permissionService.checkPermission(uid, per))) {
+        throw new BusinessException(ReturnCode.FORBIDDEN_ERROR, "无权限", request);
+      }
+    }
+
+    // 通过权限校验，放行
+    return joinPoint.proceed();
+  }
 }

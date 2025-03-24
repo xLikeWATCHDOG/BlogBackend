@@ -1,62 +1,62 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>感谢您的举报</title>
-    <style type="text/css">
-        body {
-            font-family: 'Google Sans', Roboto, Arial, sans-serif;
-            background-color: #FAFAFA;
-            margin: 0;
-            padding: 0;
-            color: #202124;
-        }
+  <meta charset="UTF-8">
+  <title>感谢您的举报</title>
+  <style type="text/css">
+    body {
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      background-color: #FAFAFA;
+      margin: 0;
+      padding: 0;
+      color: #202124;
+    }
 
-        .container {
-            text-align: center;
-            padding: 40px;
-        }
+    .container {
+      text-align: center;
+      padding: 40px;
+    }
 
-        .message {
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            display: inline-block;
-            margin: auto;
-            padding: 40px 20px;
-            background-color: #FFFFFF;
-            max-width: 400px;
-        }
+    .message {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      display: inline-block;
+      margin: auto;
+      padding: 40px 20px;
+      background-color: #FFFFFF;
+      max-width: 400px;
+    }
 
-        .code {
-            display: inline-block;
-            border-radius: 4px;
-            background-color: #E8F0FE;
-            padding: 10px 15px;
-            font-size: 18px;
-            letter-spacing: 3px;
-            margin-top: 20px;
-            font-weight: bold;
-            color: #1a73e8;
-        }
+    .code {
+      display: inline-block;
+      border-radius: 4px;
+      background-color: #E8F0FE;
+      padding: 10px 15px;
+      font-size: 18px;
+      letter-spacing: 3px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #1a73e8;
+    }
 
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #5f6368;
-        }
-    </style>
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #5f6368;
+    }
+  </style>
 </head>
 <body>
 <div class="container">
-    <div class="message">
-        <h2>您的举报状态已变更</h2>
-        <p>我们已收到您的举报信息，工作人员会尽快进行审核和处理。</p>
-        <p>您的举报编号为：</p>
-        <div class="code" th:text="${reportId}"></div>
-        <p>您的举报当前进度为:</p>
-        <div class="process" th:text="${process}"></div>
-        <p class="footer">我们将在3个工作日内对您的举报进行处理，感谢您为维护社区环境做出的贡献。</p>
-    </div>
+  <div class="message">
+    <h2>您的举报状态已变更</h2>
+    <p>我们已收到您的举报信息，工作人员会尽快进行审核和处理。</p>
+    <p>您的举报编号为：</p>
+    <div class="code" th:text="${reportId}"></div>
+    <p>您的举报当前进度为:</p>
+    <div class="process" th:text="${process}"></div>
+    <p class="footer">我们将在3个工作日内对您的举报进行处理，感谢您为维护社区环境做出的贡献。</p>
+  </div>
 </div>
 </body>
 </html>

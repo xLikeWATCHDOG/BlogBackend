@@ -18,44 +18,44 @@ import java.util.Date;
 @Table("oauth")
 @Data
 public class OAuth implements Serializable {
-    @Serial
-    @Column(ignore = true)
-    private static final long serialVersionUID = 1L;
-    /**
-     * id
-     */
-    @Id(keyType = KeyType.Auto)
-    @Schema(description = "ID")
-    @ExcelProperty(value = "ID", index = 0)
-    private Long id;
+  @Serial
+  @Column(ignore = true)
+  private static final long serialVersionUID = 1L;
+  /**
+   * id
+   */
+  @Id(keyType = KeyType.Auto)
+  @Schema(description = "ID")
+  @ExcelProperty(value = "ID", index = 0)
+  private Long id;
 
-    @Schema(description = "UID")
-    @ExcelProperty(value = "UID", index = 1)
-    private Long uid;
+  @Schema(description = "UID")
+  @ExcelProperty(value = "UID", index = 1)
+  private Long uid;
 
-    @Schema(description = "平台")
-    @ExcelProperty(value = "平台", index = 2)
-    private Integer platform;
+  @Schema(description = "平台")
+  @ExcelProperty(value = "平台", index = 2)
+  private Integer platform;
 
-    @Schema(description = "openId")
-    @ExcelProperty(value = "openId", index = 3)
-    private String openId;
+  @Schema(description = "openId")
+  @ExcelProperty(value = "openId", index = 3)
+  private String openId;
 
-    @Schema(description = "token")
-    @ExcelProperty(value = "token", index = 4)
-    private String token;
+  @Schema(description = "token")
+  @ExcelProperty(value = "token", index = 4)
+  private String token;
 
-    @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 5)
-    private Date createTime;
+  @Schema(description = "创建时间")
+  @ExcelProperty(value = "创建时间", index = 5)
+  private Date createTime;
 
-    @Schema(description = "更新时间")
-    @ExcelProperty(value = "更新时间", index = 6)
-    @Column(onUpdateValue = "now()")
-    private Date updateTime;
+  @Schema(description = "更新时间")
+  @ExcelProperty(value = "更新时间", index = 6)
+  @Column(onUpdateValue = "now()")
+  private Date updateTime;
 
-    @Schema(description = "可用性")
-    @ExcelProperty(value = "可用性", index = 7)
-    @Column(isLogicDelete = true)
-    private Integer available;
+  @Schema(description = "可用性")
+  @ExcelProperty(value = "可用性", index = 7)
+  @Column(isLogicDelete = true)
+  private Integer available;
 }

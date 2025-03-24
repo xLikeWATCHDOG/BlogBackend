@@ -1,5 +1,6 @@
-package com.birdy.blogbackend.domain.vo.request;
+package com.birdy.blogbackend.domain.vo.request.report;
 
+import com.birdy.blogbackend.domain.vo.request.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,8 +13,8 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ReportQueryRequest extends PageRequest implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private Long uid;
+  private Long uid;
 }

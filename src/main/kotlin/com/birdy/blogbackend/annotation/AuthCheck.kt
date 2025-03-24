@@ -8,13 +8,13 @@ package com.birdy.blogbackend.annotation
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class AuthCheck(
-    /**
-     * 有任何一个权限
-     */
-    val any: Array<String> = [""],
-    /**
-     * 必须有某些权限
-     */
-    val must: Array<String> = [""]
+  /**
+   * 有任何一个权限
+   */
+  val any: Array<String> = [""],
+  /**
+   * 必须有某些权限
+   */
+  val must: Array<String> = [""]
 )
 

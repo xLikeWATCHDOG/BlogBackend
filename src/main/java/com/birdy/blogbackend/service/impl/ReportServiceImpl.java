@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ReportServiceImpl implements ReportService {
-    @Autowired
-    private ReportDao reportDao;
+  @Autowired
+  private ReportDao reportDao;
 
-    @Override
-    public BaseMapper<Report> getMapper() {
-        return reportDao.getMapper();
-    }
+  @Override
+  public BaseMapper<Report> getMapper() {
+    return reportDao.getMapper();
+  }
 }

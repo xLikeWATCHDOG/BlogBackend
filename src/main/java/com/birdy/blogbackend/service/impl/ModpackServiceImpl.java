@@ -15,27 +15,27 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ModpackServiceImpl implements ModpackService {
-    @Autowired
-    private ModpackDao modpackDao;
+  @Autowired
+  private ModpackDao modpackDao;
 
-    @Override
-    public BaseMapper<Modpack> getMapper() {
-        return modpackDao.getMapper();
-    }
+  @Override
+  public BaseMapper<Modpack> getMapper() {
+    return modpackDao.getMapper();
+  }
 
-    @Override
-    public long countToday() {
-        // 记录今日的数量
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("to_char(create_time, 'YYYY-MM-DD')", "to_char(CURRENT_DATE, 'YYYY-MM-DD')");
-        return modpackDao.getMapper().selectCountByQuery(queryWrapper);
-    }
+  @Override
+  public long countToday() {
+    // 记录今日的数量
+    QueryWrapper queryWrapper = new QueryWrapper();
+    queryWrapper.eq("to_char(create_time, 'YYYY-MM-DD')", "to_char(CURRENT_DATE, 'YYYY-MM-DD')");
+    return modpackDao.getMapper().selectCountByQuery(queryWrapper);
+  }
 
-    @Override
-    public long countPending() {
-        // 记录待审核的数量
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("status", 0);
-        return modpackDao.getMapper().selectCountByQuery(queryWrapper);
-    }
+  @Override
+  public long countPending() {
+    // 记录待审核的数量
+    QueryWrapper queryWrapper = new QueryWrapper();
+    queryWrapper.eq("status", 0);
+    return modpackDao.getMapper().selectCountByQuery(queryWrapper);
+  }
 }

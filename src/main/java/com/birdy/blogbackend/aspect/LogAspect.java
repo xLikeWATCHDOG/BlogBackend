@@ -29,69 +29,69 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Component
 @Slf4j
 public class LogAspect {
-    @Autowired
-    private LogService logService;
-    @Autowired
-    private VisitorService visitorService;
+  @Autowired
+  private LogService logService;
+  @Autowired
+  private VisitorService visitorService;
 
-    /**
-     * 执行拦截
-     */
-    @Around("execution(* com.birdy.blogbackend.controller.*.*(..))")
-    public Object doInterceptor(ProceedingJoinPoint point) throws Throwable {
-        Gson gson = GsonProvider.normal();
-        // 计时
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        // 获取请求路径
-        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-        // 获取请求方法
-        String method = request.getMethod();
-        // 获取ip
-        String ip = JakartaServletUtil.getClientIP(request);
-        // 生成请求唯一 id
-        String requestId = IdUtil.randomUUID();
-        String url = request.getRequestURI();
-        // 获取请求参数
-        var paramMap = JakartaServletUtil.getParamMap(request);
-        String reqParam = gson.toJson(paramMap);
-        // 开始记录请求日志
-        log.info("发起请求：[ID：{},方法：{},路径：{},IP：{},参数：{}]", requestId, method, url, ip, reqParam);
+  /**
+   * 执行拦截
+   */
+  @Around("execution(* com.birdy.blogbackend.controller.*.*(..))")
+  public Object doInterceptor(ProceedingJoinPoint point) throws Throwable {
+    Gson gson = GsonProvider.normal();
+    // 计时
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
+    // 获取请求路径
+    RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+    HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+    // 获取请求方法
+    String method = request.getMethod();
+    // 获取ip
+    String ip = JakartaServletUtil.getClientIP(request);
+    // 生成请求唯一 id
+    String requestId = IdUtil.randomUUID();
+    String url = request.getRequestURI();
+    // 获取请求参数
+    var paramMap = JakartaServletUtil.getParamMap(request);
+    String reqParam = gson.toJson(paramMap);
+    // 开始记录请求日志
+    log.info("发起请求：[ID：{},方法：{},路径：{},IP：{},参数：{}]", requestId, method, url, ip, reqParam);
 
-        // 执行请求
-        Object result = point.proceed();
-        stopWatch.stop();
+    // 执行请求
+    Object result = point.proceed();
+    stopWatch.stop();
 
-        // 记录请求结束日志
-        long totalTimeMillis = stopWatch.getTotalTimeMillis();
-        log.info("请求完成：[ID：{},持续时间：{} ms]", requestId, totalTimeMillis);
+    // 记录请求结束日志
+    long totalTimeMillis = stopWatch.getTotalTimeMillis();
+    log.info("请求完成：[ID：{},持续时间：{} ms]", requestId, totalTimeMillis);
 
-        if (result instanceof BaseResponse) {
-            var baseResponse = (BaseResponse<Object>) result;
-            BaseResponse.RequestInfo requestInfo = BaseResponse.RequestInfo.builder()
-                    .requestId(requestId)
-                    .cost(totalTimeMillis).build();
-            baseResponse.setRequestInfo(requestInfo);
+    if (result instanceof BaseResponse) {
+      var baseResponse = (BaseResponse<Object>) result;
+      BaseResponse.RequestInfo requestInfo = BaseResponse.RequestInfo.builder()
+        .requestId(requestId)
+        .cost(totalTimeMillis).build();
+      baseResponse.setRequestInfo(requestInfo);
 
-        }
-        String resultStr = null;
-        try {
-            resultStr = gson.toJson(result);
-        } catch (Throwable e) {
-            log.error("序列化返回结果失败", e);
-        }
-        Log l = Log.builder()
-                .requestId(requestId)
-                .url(url)
-                .method(method)
-                .ip(ip)
-                .params(reqParam)
-                .result(resultStr)
-                .cost(totalTimeMillis)
-                .build();
-        logService.save(l);
-        visitorService.addOne();
-        return result;
     }
+    String resultStr = null;
+    try {
+      resultStr = gson.toJson(result);
+    } catch (Throwable e) {
+      log.error("序列化返回结果失败", e);
+    }
+    Log l = Log.builder()
+      .requestId(requestId)
+      .url(url)
+      .method(method)
+      .ip(ip)
+      .params(reqParam)
+      .result(resultStr)
+      .cost(totalTimeMillis)
+      .build();
+    logService.save(l);
+    visitorService.addOne();
+    return result;
+  }
 }

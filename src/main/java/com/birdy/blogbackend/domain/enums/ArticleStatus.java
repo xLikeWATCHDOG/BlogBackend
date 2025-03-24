@@ -8,33 +8,33 @@ import lombok.Getter;
 
 @Getter
 public enum ArticleStatus {
-    /**
-     * 正常
-     */
-    NORMAL(0, "正常"),
-    /**
-     * 禁用
-     */
-    BANNED(1, "禁用"),
-    /**
-     * 删除
-     */
-    DELETED(2, "删除");
+  /**
+   * 正常
+   */
+  NORMAL(0, "正常"),
+  /**
+   * 禁用
+   */
+  BANNED(1, "禁用"),
+  /**
+   * 删除
+   */
+  DELETED(2, "删除");
 
-    final int code;
-    final String desc;
+  final int code;
+  final String desc;
 
-    ArticleStatus(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
+  ArticleStatus(int code, String desc) {
+    this.code = code;
+    this.desc = desc;
+  }
+
+  public static ArticleStatus valueOf(int value) {
+    for (ArticleStatus status : ArticleStatus.values()) {
+      if (status.code == value) {
+        return status;
+      }
     }
-
-    public static ArticleStatus valueOf(int value) {
-        for (ArticleStatus status : ArticleStatus.values()) {
-            if (status.code == value) {
-                return status;
-            }
-        }
-        return BANNED;
-    }
+    return BANNED;
+  }
 }

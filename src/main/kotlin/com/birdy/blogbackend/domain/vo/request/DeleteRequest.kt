@@ -6,10 +6,10 @@ import java.io.Serializable
  * 删除请求
  */
 data class DeleteRequest(
-    var id: Long? = null
+  var id: Long? = null
 ) : Serializable {
-    companion object {
-        @JvmStatic
-        private val serialVersionUID: Long = 1L
-    }
+  companion object {
+    @JvmStatic
+    private val serialVersionUID: Long = 1L
+  }
 }

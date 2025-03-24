@@ -20,21 +20,21 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Aspect
 @Component
 public class LocalAspect {
-    @Around("@annotation(local)")
-    public Object doInterceptor(ProceedingJoinPoint joinPoint, Local local) throws Throwable {
-        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+  @Around("@annotation(local)")
+  public Object doInterceptor(ProceedingJoinPoint joinPoint, Local local) throws Throwable {
+    RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+    HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 
-        String ip = JakartaServletUtil.getClientIP(request);
-        boolean isInternal = NetUtil.isInnerIP(ip);
+    String ip = JakartaServletUtil.getClientIP(request);
+    boolean isInternal = NetUtil.isInnerIP(ip);
 
-        if (!isInternal) {
-            throw new BusinessException(ReturnCode.FORBIDDEN_ERROR,
-                    "非法请求",
-                    request
-            );
-        }
-
-        return joinPoint.proceed();
+    if (!isInternal) {
+      throw new BusinessException(ReturnCode.FORBIDDEN_ERROR,
+        "非法请求",
+        request
+      );
     }
+
+    return joinPoint.proceed();
+  }
 }

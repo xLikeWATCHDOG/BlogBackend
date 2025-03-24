@@ -1,4 +1,4 @@
-package com.birdy.blogbackend.domain.vo.request;
+package com.birdy.blogbackend.domain.vo.request.report;
 
 import lombok.Data;
 
@@ -10,9 +10,9 @@ import java.io.Serializable;
  */
 @Data
 public class ReportChangeStatusRequest implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private Integer status;
+  private Long id;
+  private Integer status;
 }

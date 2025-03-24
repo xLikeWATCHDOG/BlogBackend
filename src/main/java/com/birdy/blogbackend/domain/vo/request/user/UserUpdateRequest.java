@@ -10,10 +10,10 @@ import java.io.Serializable;
  */
 @Data
 public class UserUpdateRequest implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private Integer gender;
+  private Integer gender;
 
-    private String username;
+  private String username;
 }

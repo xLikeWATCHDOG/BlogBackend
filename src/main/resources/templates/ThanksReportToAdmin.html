@@ -1,70 +1,70 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>感谢您的举报</title>
-    <style type="text/css">
-        body {
-            font-family: 'Google Sans', Roboto, Arial, sans-serif;
-            background-color: #FAFAFA;
-            margin: 0;
-            padding: 0;
-            color: #202124;
-        }
+  <meta charset="UTF-8">
+  <title>感谢您的举报</title>
+  <style type="text/css">
+    body {
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      background-color: #FAFAFA;
+      margin: 0;
+      padding: 0;
+      color: #202124;
+    }
 
-        .container {
-            text-align: center;
-            padding: 40px;
-        }
+    .container {
+      text-align: center;
+      padding: 40px;
+    }
 
-        .message {
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            display: inline-block;
-            margin: auto;
-            padding: 40px 20px;
-            background-color: #FFFFFF;
-            max-width: 400px;
-        }
+    .message {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      display: inline-block;
+      margin: auto;
+      padding: 40px 20px;
+      background-color: #FFFFFF;
+      max-width: 400px;
+    }
 
-        .code {
-            display: inline-block;
-            border-radius: 4px;
-            background-color: #E8F0FE;
-            padding: 10px 15px;
-            font-size: 18px;
-            letter-spacing: 3px;
-            margin-top: 20px;
-            font-weight: bold;
-            color: #1a73e8;
-        }
+    .code {
+      display: inline-block;
+      border-radius: 4px;
+      background-color: #E8F0FE;
+      padding: 10px 15px;
+      font-size: 18px;
+      letter-spacing: 3px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #1a73e8;
+    }
 
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #5f6368;
-        }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #5f6368;
+    }
 
-        .report-content {
-            text-align: left;
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 10px 0;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-    </style>
+    .report-content {
+      text-align: left;
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  </style>
 </head>
 <body>
 <div class="container">
-    <div class="message">
-        <h2>新举报通知</h2>
-        <p>您收到了一份新的举报信息，请及时处理。</p>
-        <p>举报编号：</p>
-        <div class="code" th:text="${reportId}"></div>
-        <p class="footer">请在3个工作日内处理此举报，如有特殊情况请及时反馈。</p>
-    </div>
+  <div class="message">
+    <h2>新举报通知</h2>
+    <p>您收到了一份新的举报信息，请及时处理。</p>
+    <p>举报编号：</p>
+    <div class="code" th:text="${reportId}"></div>
+    <p class="footer">请在3个工作日内处理此举报，如有特殊情况请及时反馈。</p>
+  </div>
 </div>
 </body>
 </html>

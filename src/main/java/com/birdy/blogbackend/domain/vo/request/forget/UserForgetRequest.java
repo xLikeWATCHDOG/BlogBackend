@@ -10,8 +10,8 @@ import java.io.Serializable;
  */
 @Data
 public class UserForgetRequest implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private String email;
+  private String email;
 }

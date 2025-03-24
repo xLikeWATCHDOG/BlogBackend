@@ -18,22 +18,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/comment")
 @Slf4j
 public class CommentController {
-    @Autowired
-    private ArticleCommentService articleCommentService;
+  @Autowired
+  private ArticleCommentService articleCommentService;
 
-    @AuthCheck(must = "group.admin")
-    @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse<ArticleComment>> getComment(@PathVariable Integer id,
-                                                                   HttpServletRequest request) {
-        ArticleComment stats = articleCommentService.getById(id);
-        return ResultUtil.ok(stats);
-    }
+  @AuthCheck(must = "group.admin")
+  @GetMapping("/{id}")
+  public ResponseEntity<BaseResponse<ArticleComment>> getComment(@PathVariable Integer id,
+                                                                 HttpServletRequest request) {
+    ArticleComment stats = articleCommentService.getById(id);
+    return ResultUtil.ok(stats);
+  }
 
-    @AuthCheck(must = "group.admin")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse<Boolean>> deleteComment(@PathVariable Integer id,
-                                                               HttpServletRequest request) {
-        articleCommentService.removeById(id);
-        return ResultUtil.ok(true);
-    }
+  @AuthCheck(must = "group.admin")
+  @DeleteMapping("/{id}")
+  public ResponseEntity<BaseResponse<Boolean>> deleteComment(@PathVariable Integer id,
+                                                             HttpServletRequest request) {
+    articleCommentService.removeById(id);
+    return ResultUtil.ok(true);
+  }
 }

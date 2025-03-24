@@ -23,44 +23,44 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArticleVO implements Serializable {
-    @Serial
-    @Column(ignore = true)
-    private static final long serialVersionUID = 1L;
+  @Serial
+  @Column(ignore = true)
+  private static final long serialVersionUID = 1L;
 
-    @Id(keyType = KeyType.Auto)
-    @Schema(description = "ID")
-    @ExcelProperty(value = "ID", index = 0)
-    private Long id;
+  @Id(keyType = KeyType.Auto)
+  @Schema(description = "ID")
+  @ExcelProperty(value = "ID", index = 0)
+  private Long id;
 
-    @Schema(description = "标题")
-    @ExcelProperty(value = "标题", index = 1)
-    private String title;
+  @Schema(description = "标题")
+  @ExcelProperty(value = "标题", index = 1)
+  private String title;
 
-    @Schema(description = "描述")
-    @ExcelProperty(value = "描述", index = 2)
-    private String description;
+  @Schema(description = "描述")
+  @ExcelProperty(value = "描述", index = 2)
+  private String description;
 
-    @Schema(description = "内容")
-    @ExcelProperty(value = "内容", index = 3)
-    private String content;
+  @Schema(description = "内容")
+  @ExcelProperty(value = "内容", index = 3)
+  private String content;
 
-    @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 4)
-    private Date createTime;
+  @Schema(description = "创建时间")
+  @ExcelProperty(value = "创建时间", index = 4)
+  private Date createTime;
 
-    @Schema(description = "标签")
-    @ExcelProperty(value = "标签", index = 5)
-    private List<String> tags;
+  @Schema(description = "标签")
+  @ExcelProperty(value = "标签", index = 5)
+  private List<String> tags;
 
-    @Schema(description = "浏览量")
-    @ExcelProperty(value = "浏览量", index = 6)
-    private Long views;
+  @Schema(description = "浏览量")
+  @ExcelProperty(value = "浏览量", index = 6)
+  private Long views;
 
-    @Schema(description = "图片地址")
-    @ExcelProperty(value = "图片地址", index = 7)
-    private String image;
+  @Schema(description = "图片地址")
+  @ExcelProperty(value = "图片地址", index = 7)
+  private String image;
 
-    @Schema(description = "作者")
-    @ExcelProperty(value = "作者", index = 8)
-    private String author;
+  @Schema(description = "作者")
+  @ExcelProperty(value = "作者", index = 8)
+  private String author;
 }

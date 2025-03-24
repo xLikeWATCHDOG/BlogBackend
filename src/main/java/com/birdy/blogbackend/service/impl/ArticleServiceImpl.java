@@ -15,18 +15,18 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ArticleServiceImpl implements ArticleService {
-    @Autowired
-    private ArticleDao articleDao;
+  @Autowired
+  private ArticleDao articleDao;
 
-    @Override
-    public BaseMapper<Article> getMapper() {
-        return articleDao.getMapper();
-    }
+  @Override
+  public BaseMapper<Article> getMapper() {
+    return articleDao.getMapper();
+  }
 
-    @Override
-    public long countToday() {
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("to_char(create_time, 'YYYY-MM-DD')", "to_char(CURRENT_DATE, 'YYYY-MM-DD')");
-        return articleDao.getMapper().selectCountByQuery(queryWrapper);
-    }
+  @Override
+  public long countToday() {
+    QueryWrapper queryWrapper = new QueryWrapper();
+    queryWrapper.eq("to_char(create_time, 'YYYY-MM-DD')", "to_char(CURRENT_DATE, 'YYYY-MM-DD')");
+    return articleDao.getMapper().selectCountByQuery(queryWrapper);
+  }
 }

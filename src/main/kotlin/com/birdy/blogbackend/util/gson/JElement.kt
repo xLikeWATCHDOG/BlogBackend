@@ -6,5 +6,5 @@ import com.google.gson.JsonElement
  * Stupidly simple fluent gson wrappers
  */
 interface JElement {
-    fun toJson(): JsonElement?
+  fun toJson(): JsonElement?
 }

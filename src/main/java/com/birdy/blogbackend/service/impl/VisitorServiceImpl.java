@@ -15,40 +15,40 @@ import java.util.Date;
 @Service
 @Slf4j
 public class VisitorServiceImpl implements VisitorService {
-    @Autowired
-    private VisitorDao visitorDao;
+  @Autowired
+  private VisitorDao visitorDao;
 
-    @Override
-    public void addOne() {
-        // 设置日期，时分秒毫秒都设为0
-        LocalDate localDate = LocalDate.now();
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+  @Override
+  public void addOne() {
+    // 设置日期，时分秒毫秒都设为0
+    LocalDate localDate = LocalDate.now();
+    Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        Visitor visitor = visitorDao.getById(date);
+    Visitor visitor = visitorDao.getById(date);
 
-        if (visitor == null) {
-            // 如果今天没有记录，创建新记录
-            visitor = new Visitor();
-            visitor.setDate(date);
-            visitor.setCount(1L);
-            visitorDao.save(visitor);
-        } else {
-            // 如果有记录，更新计数
-            visitor.setCount(visitor.getCount() + 1);
-            visitorDao.updateById(visitor);
-        }
+    if (visitor == null) {
+      // 如果今天没有记录，创建新记录
+      visitor = new Visitor();
+      visitor.setDate(date);
+      visitor.setCount(1L);
+      visitorDao.save(visitor);
+    } else {
+      // 如果有记录，更新计数
+      visitor.setCount(visitor.getCount() + 1);
+      visitorDao.updateById(visitor);
     }
+  }
 
-    @Override
-    public BaseMapper<Visitor> getMapper() {
-        return visitorDao.getMapper();
-    }
+  @Override
+  public BaseMapper<Visitor> getMapper() {
+    return visitorDao.getMapper();
+  }
 
-    @Override
-    public long getToday() {
-        LocalDate localDate = LocalDate.now();
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Visitor visitor = visitorDao.getById(date);
-        return visitor.getCount();
-    }
+  @Override
+  public long getToday() {
+    LocalDate localDate = LocalDate.now();
+    Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    Visitor visitor = visitorDao.getById(date);
+    return visitor.getCount();
+  }
 }

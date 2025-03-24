@@ -18,40 +18,40 @@ import java.util.Date;
 @Table("article_comment")
 @Data
 public class ArticleComment implements Serializable {
-    @Serial
-    @Column(ignore = true)
-    private static final long serialVersionUID = 1L;
-    /**
-     * id
-     */
-    @Id(keyType = KeyType.Auto)
-    @Schema(description = "ID")
-    @ExcelProperty(value = "ID", index = 0)
-    public Long id;
+  @Serial
+  @Column(ignore = true)
+  private static final long serialVersionUID = 1L;
+  /**
+   * id
+   */
+  @Id(keyType = KeyType.Auto)
+  @Schema(description = "ID")
+  @ExcelProperty(value = "ID", index = 0)
+  public Long id;
 
-    @Schema(description = "用户ID")
-    @ExcelProperty(value = "用户ID", index = 1)
-    private Long uid;
+  @Schema(description = "用户ID")
+  @ExcelProperty(value = "用户ID", index = 1)
+  private Long uid;
 
-    @Schema(description = "文章ID")
-    @ExcelProperty(value = "文章ID", index = 2)
-    private Long aid;
+  @Schema(description = "文章ID")
+  @ExcelProperty(value = "文章ID", index = 2)
+  private Long aid;
 
-    @Schema(description = "内容")
-    @ExcelProperty(value = "内容", index = 3)
-    private String content;
+  @Schema(description = "内容")
+  @ExcelProperty(value = "内容", index = 3)
+  private String content;
 
-    @Schema(description = "创建时间")
-    @ExcelProperty(value = "创建时间", index = 4)
-    private Date createTime;
+  @Schema(description = "创建时间")
+  @ExcelProperty(value = "创建时间", index = 4)
+  private Date createTime;
 
-    @Schema(description = "更新时间")
-    @ExcelProperty(value = "更新时间", index = 5)
-    @Column(onUpdateValue = "now()")
-    private Date updateTime;
+  @Schema(description = "更新时间")
+  @ExcelProperty(value = "更新时间", index = 5)
+  @Column(onUpdateValue = "now()")
+  private Date updateTime;
 
-    @Schema(description = "可用性")
-    @ExcelProperty(value = "可用性", index = 6)
-    @Column(isLogicDelete = true)
-    private Integer available;
+  @Schema(description = "可用性")
+  @ExcelProperty(value = "可用性", index = 6)
+  @Column(isLogicDelete = true)
+  private Integer available;
 }

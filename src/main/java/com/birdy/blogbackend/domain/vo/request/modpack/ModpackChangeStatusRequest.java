@@ -1,4 +1,4 @@
-package com.birdy.blogbackend.domain.vo.request.permission;
+package com.birdy.blogbackend.domain.vo.request.modpack;
 
 import lombok.Data;
 
@@ -9,10 +9,11 @@ import java.io.Serializable;
  * @author birdy
  */
 @Data
-public class PermissionUpdateRequest implements Serializable {
+public class ModpackChangeStatusRequest implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
+
   private Long id;
-  private String permission;
-  private Long expiry;
+  private String reason;
+  private Integer status;
 }
