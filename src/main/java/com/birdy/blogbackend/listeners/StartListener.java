@@ -19,6 +19,7 @@ import java.util.Objects;
 @Slf4j
 @Component
 public class StartListener {
+
   public static void createDirectory(String... paths) {
     Path path = Paths.get("", paths);
     try {
@@ -50,30 +51,48 @@ public class StartListener {
     }
   }
 
+  private static void releaseStartScript() {
+    Path startScriptPath = Paths.get("app.sh");
+    if (!Files.exists(startScriptPath)) {
+      log.error("app.sh 文件不存在，将要释放 app.sh 文件...");
+      try {
+        Files.copy(Objects.requireNonNull(BlogBackendApplicationKt.class.getClassLoader().getResourceAsStream("app.sh")), startScriptPath);
+        log.info("app.sh 文件释放完成！");
+      } catch (IOException e) {
+        log.error("Failed to copy app.sh file", e);
+      }
+    }
+  }
+
   @PostConstruct
   public void init() {
     log.info("StartListener init.\n开始检查项目完整性(这可能需要一些时间)...");
+
     // 创建一个隐藏的文件.initiated,检查是否已经初始化,如果已经初始化则不再初始化
     Path initiated = Paths.get(".initiated");
     if (Files.exists(initiated)) {
       log.info("项目已经初始化: .initiated");
       return;
     }
+    releaseStartScript();
     createDirectory("./data");
-    // 检查./data/ip2region.xdb是否存在
+
+    // 检查 ./data/ip2region.xdb 是否存在
     String ipDbPath = IpRegionUtil.DB_PATH;
     if (!Files.exists(Paths.get(ipDbPath))) {
       log.error("ip2region.xdb 文件不存在: {}!\n", ipDbPath);
-      log.error("开始下载ip2region.xdb文件，请稍等...");
+      log.error("开始下载 ip2region.xdb 文件，请稍等...");
       IpRegionUtil.getInstance().downloadIpDb();
     }
-    // 释放config/application.yml
+
+    // 释放 config/application.yml
     if (!Files.exists(Paths.get("./config/application.yml"))) {
       log.error("application.yml 文件不存在: ./config/application.yml!\n");
-      log.error("开始释放application.yml文件，请稍等...");
+      log.error("开始释放 application.yml 文件，请稍等...");
       releaseConfigFile("application.yml");
       releaseConfigFile("application.properties");
     }
+
     createDirectory("data", "alipay");
     createDirectory("data", "wechat");
     createEmptyFile("data", "alipay", "alipayCertPublicKey.crt");
@@ -85,7 +104,7 @@ public class StartListener {
 
     AESUtil.init();
 
-    // 创建一个隐藏的文件.initiated,标记项目已经初始化
+    // 创建一个隐藏的文件 .initiated，标记项目已经初始化
     try {
       Files.createFile(initiated);
     } catch (IOException e) {
@@ -93,4 +112,3 @@ public class StartListener {
     }
   }
 }
-

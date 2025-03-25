@@ -69,4 +69,14 @@ public class UserVO implements Serializable {
   @Schema(description = "用户组")
   @ExcelProperty(value = "用户组", index = 10)
   private Permission group;
+
+  private Stats stats;
+
+  @Data
+  public static class Stats {
+    private Long articleCount = 0L;
+    private Long modpackCount = 0L;
+    private Long followersCount = 0L;
+    private Long followingCount = 0L;
+  }
 }

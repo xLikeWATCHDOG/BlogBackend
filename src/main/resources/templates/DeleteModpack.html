@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>删除请求</title>
+  <style type="text/css">
+    body {
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      background-color: #FAFAFA;
+      margin: 0;
+      padding: 0;
+      color: #202124;
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .message {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      display: inline-block;
+      margin: auto;
+      padding: 40px 20px;
+      background-color: #FFFFFF;
+      max-width: 400px;
+    }
+
+    .code {
+      display: inline-block;
+      border-radius: 4px;
+      background-color: #E8F0FE;
+      padding: 10px 15px;
+      font-size: 18px;
+      letter-spacing: 3px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #1a73e8;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="message">
+    <h2>有一个新的删除请求</h2>
+    <p>整合包编号：</p>
+    <div class="code" th:text="${name}"></div>
+    <p>原因：</p>
+    <div class="code" th:text="${reason}"></div>
+  </div>
+</div>
+</body>
+</html>

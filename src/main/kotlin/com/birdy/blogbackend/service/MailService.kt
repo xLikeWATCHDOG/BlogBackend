@@ -1,5 +1,6 @@
 package com.birdy.blogbackend.service
 
+import com.birdy.blogbackend.domain.entity.Modpack
 import com.birdy.blogbackend.domain.entity.Report
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.scheduling.annotation.Async
@@ -22,4 +23,7 @@ interface MailService {
 
   @Async
   fun sendReportChangeMailToUser(report: Report, request: HttpServletRequest)
+
+  @Async
+  fun sendDeleteModpackToAdmin(to: String, modpack: Modpack, reason: String, request: HttpServletRequest)
 }

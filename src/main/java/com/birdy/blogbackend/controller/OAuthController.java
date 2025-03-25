@@ -50,6 +50,7 @@ public class OAuthController {
     // 直接重定向到url
     try {
       if (configProperties.getGithub().isEnable()) {
+        log.info(url);
         response.sendRedirect(url);
       } else {
         response.sendRedirect(websiteUrl);

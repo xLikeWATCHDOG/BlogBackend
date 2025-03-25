@@ -1,6 +1,7 @@
 package com.birdy.blogbackend.service.impl;
 
 import com.birdy.blogbackend.dao.UserDao;
+import com.birdy.blogbackend.domain.entity.Modpack;
 import com.birdy.blogbackend.domain.entity.Report;
 import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
@@ -162,6 +163,29 @@ public class MailServiceImpl implements MailService {
       context.setVariable("reportId", report.getId());
       context.setVariable("process", report.getReportStatus().getDescription());
       String text = templateEngine.process("ReportStatusChange", context);
+      helper.setText(text, true);
+      javaMailSender.send(message);
+    } catch (Exception e) {
+      log.error("邮件发送失败，邮箱：{}，错误信息：{}", to, e.getMessage());
+      throw new BusinessException(ReturnCode.SYSTEM_ERROR, "邮件发送失败，请稍后重试", null);
+    }
+  }
+
+  @Async
+  @Override
+  public void sendDeleteModpackToAdmin(@NotNull String to, @NotNull Modpack modpack, @NotNull String reason, @NotNull HttpServletRequest request) {
+    checkEmail(to);
+    MimeMessage message = javaMailSender.createMimeMessage();
+    try {
+      MimeMessageHelper helper = new MimeMessageHelper(message, true);
+      helper.setFrom(from);
+      helper.setTo(to);
+      helper.setSubject("有一个新的删除请求");
+      helper.setCc(from);
+      Context context = new Context();
+      context.setVariable("reason", reason);
+      context.setVariable("name", modpack.getName());
+      String text = templateEngine.process("DeleteModpack", context);
       helper.setText(text, true);
       javaMailSender.send(message);
     } catch (Exception e) {

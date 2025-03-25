@@ -9,6 +9,7 @@ import com.birdy.blogbackend.domain.entity.Photo;
 import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.ReturnCode;
 import com.birdy.blogbackend.domain.vo.request.modpack.ModpackChangeStatusRequest;
+import com.birdy.blogbackend.domain.vo.request.modpack.ModpackDeleteRequest;
 import com.birdy.blogbackend.domain.vo.request.modpack.ModpackQueryRequest;
 import com.birdy.blogbackend.domain.vo.response.BaseResponse;
 import com.birdy.blogbackend.domain.vo.response.TencentCaptchaResponse;
@@ -185,16 +186,16 @@ public class ModpackController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<BaseResponse<Long>> deleteModpack(@PathVariable("id") Long id, HttpServletRequest request) {
+  public ResponseEntity<BaseResponse<Long>> deleteModpack(@PathVariable("id") Long id,
+                                                          @RequestBody ModpackDeleteRequest modpackDeleteRequest,
+                                                          HttpServletRequest request) {
     String token = request.getHeader(LOGIN_TOKEN);
     User user = userService.getUserByToken(token, request);
     Modpack modpack = modpackService.getById(id);
     if (modpack.getUid().equals(user.getUid()) && !permissionService.checkPermission(user.getUid(), "group.admin")) {
       throw new BusinessException(ReturnCode.FORBIDDEN_ERROR, "You are not allowed to delete this modpack", request);
     }
-    if (modpack == null) {
-      throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "Modpack not found", request);
-    }
+    userService.sendDeleteModpackMailToAdmin(modpackDeleteRequest.getReason(), modpack, request);
     modpackService.removeById(id);
     return ResultUtil.ok(id);
   }

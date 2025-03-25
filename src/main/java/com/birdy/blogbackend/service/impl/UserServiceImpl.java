@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.birdy.blogbackend.dao.OAuthDao;
 import com.birdy.blogbackend.dao.PermissionDao;
 import com.birdy.blogbackend.dao.UserDao;
+import com.birdy.blogbackend.domain.entity.Modpack;
 import com.birdy.blogbackend.domain.entity.OAuth;
 import com.birdy.blogbackend.domain.entity.User;
 import com.birdy.blogbackend.domain.enums.OAuthPlatform;
@@ -270,7 +271,11 @@ public class UserServiceImpl implements UserService {
     if (user == null) {
       // 不存在则创建新用户
       user = new User();
+      user.setUsername(phoneLoginRequest.getPhone());
+      user.setPassword("UNKNOWN");
+      user.setGender(3);
       user.setPhone(phoneLoginRequest.getPhone());
+      user.setStatus(0);
       this.save(user);
     }
     setLoginState(user, request);
@@ -609,6 +614,14 @@ public class UserServiceImpl implements UserService {
   public void sendReportMailToAdmin(@NotNull String code, @NotNull String content, @NotNull HttpServletRequest request) {
     for (User admin : getAdmins()) {
       mailService.sendThanksMailToAdmin(admin.getEmail(), code, content, request);
+    }
+  }
+
+  @Async
+  @Override
+  public void sendDeleteModpackMailToAdmin(@NotNull String reason, @NotNull Modpack modpack, @NotNull HttpServletRequest request) {
+    for (User admin : getAdmins()) {
+      mailService.sendDeleteModpackToAdmin(admin.getEmail(), modpack, reason, request);
     }
   }
 }

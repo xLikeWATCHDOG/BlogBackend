@@ -17,10 +17,7 @@ import com.birdy.blogbackend.domain.vo.request.user.*;
 import com.birdy.blogbackend.domain.vo.response.BaseResponse;
 import com.birdy.blogbackend.domain.vo.response.TencentCaptchaResponse;
 import com.birdy.blogbackend.exception.BusinessException;
-import com.birdy.blogbackend.service.MailService;
-import com.birdy.blogbackend.service.PermissionService;
-import com.birdy.blogbackend.service.PhotoService;
-import com.birdy.blogbackend.service.UserService;
+import com.birdy.blogbackend.service.*;
 import com.birdy.blogbackend.util.CaffeineFactory;
 import com.birdy.blogbackend.util.NumberUtil;
 import com.birdy.blogbackend.util.PasswordUtil;
@@ -28,6 +25,7 @@ import com.birdy.blogbackend.util.aliyun.AliyunSmsUtil;
 import com.birdy.blogbackend.util.gson.GsonProvider;
 import com.birdy.blogbackend.util.tencent.TencentCaptchaUtil;
 import com.github.benmanes.caffeine.cache.Cache;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -76,6 +74,10 @@ public class UserController {
   @Autowired
   private PermissionService permissionService;
   @Autowired
+  private ArticleService articleService;
+  @Autowired
+  private ModpackService modpackService;
+  @Autowired
   private AliyunSmsUtil aliyunSmsUtil;
 
   public void checkCaptcha(HttpServletRequest request) {
@@ -123,7 +125,7 @@ public class UserController {
     PHONE_FAIL_CACHE.put(phoneCodeSendRequest.getPhone(), 0);
     Map<String, String> params = Map.of("code", code);
     boolean success = aliyunSmsUtil.send(params, phoneCodeSendRequest.getPhone());
-    if (!success) {
+    if (success) {
       log.info("手机验证码发送成功，手机号：{}", phoneCodeSendRequest.getPhone());
     } else {
       log.error("手机验证码发送失败，手机号：{}", phoneCodeSendRequest.getPhone());
@@ -320,12 +322,28 @@ public class UserController {
 
   @GetMapping("/profile/{uid}")
   public ResponseEntity<BaseResponse<UserVO>> getProfile(@PathVariable("uid") Long uid, HttpServletRequest request) {
+    // 从请求头获取token
+    String token = request.getHeader(LOGIN_TOKEN);
+    if (token == null) {
+      throw new BusinessException(ReturnCode.VALIDATION_FAILED, "Token不存在", request);
+    }
+    // 通过token获取用户
+    User u1 = userService.getUserByToken(token, request);
+    if (!u1.getUid().equals(uid) && !permissionService.checkPermission(u1.getUid(), "group.admin")) {
+      throw new BusinessException(ReturnCode.FORBIDDEN_ERROR, "你无权查看他人信息", request);
+    }
     User user = userService.getById(uid);
     if (user == null) {
       throw new BusinessException(ReturnCode.NOT_FOUND_ERROR, "用户不存在", uid, request);
     }
     UserVO userVO = new UserVO();
     BeanUtils.copyProperties(user, userVO);
+    UserVO.Stats stats = new UserVO.Stats();
+    QueryWrapper queryWrapper = new QueryWrapper();
+    queryWrapper.eq("uid", uid);
+    stats.setArticleCount(articleService.count(queryWrapper));
+    stats.setModpackCount(modpackService.count(queryWrapper));
+    userVO.setStats(stats);
     return ResultUtil.ok(userVO);
   }
 

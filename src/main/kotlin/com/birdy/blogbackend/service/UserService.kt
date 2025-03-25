@@ -1,5 +1,6 @@
 package com.birdy.blogbackend.service
 
+import com.birdy.blogbackend.domain.entity.Modpack
 import com.birdy.blogbackend.domain.entity.User
 import com.birdy.blogbackend.domain.enums.OAuthPlatform
 import com.birdy.blogbackend.domain.vo.request.phone.PhoneLoginRequest
@@ -44,4 +45,7 @@ interface UserService : IService<User?> {
 
   @Async
   fun sendReportMailToAdmin(code: String, content: String, request: HttpServletRequest)
+
+  @Async
+  fun sendDeleteModpackMailToAdmin(reason: String, modpack: Modpack, request: HttpServletRequest)
 }
